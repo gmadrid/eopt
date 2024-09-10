@@ -19,9 +19,6 @@ export default function RootLayout({
                                    }: Readonly<{
     children: React.ReactNode;
 }>) {
-    var loggedIn = false;
-
-
     return (
         <html lang="en">
         <body className={clsx(inter.className)}>

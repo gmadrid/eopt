@@ -13,27 +13,24 @@ export default function FinishLoginPage(input: any) {
 
     let [isLoggedIn, setIsLoggedIn] = useContext(LoginContext)!;
     if (isLoggedIn) {
-        redirect("/")
+        redirect("/");
+        return;
     }
 
     var fooz = false;
 
     useEffect(() => {
-        console.log("RUNNING USE EFFECT", isLoggedIn);
         if (!fooz) {
-            console.log("FETCHING");
             fetch('http://localhost:3333/api/auth_callback?verifier=' + verifier)
                 .then(r => {
-                    console.log("HEADERS:", r.headers);
                     return r.json();
                 })
                 .then(async j => {
-                    console.log("THE J", j);
                     await ping("FinishLoginPage: " + "auth response: " + JSON.stringify(j));
                     setIsLoggedIn(a => true)
                     //redirect("/")
                 });
-            return () => { console.log("CLEANUP"); setIsLoggedIn(a => true); fooz = true; }
+            return () => {  setIsLoggedIn(a => true); fooz = true; }
         }
     }, []);
 

@@ -116,7 +116,6 @@ export class ETradeClient {
             data: {}
         };
 
-        console.log("TOKEN: ", this.token);
         let authorization = this.oauth.authorize(request_data, this.token);
         let authString = this.oauth.toHeader(authorization).Authorization;
 
@@ -126,8 +125,6 @@ export class ETradeClient {
             throw new Error(`getAccounts failed: {response.status}: {response.statusText}`);
         }
 
-        const body = await response.json();
-        console.log("ACCOUNTS: ", body);
-        return body;
+        return await response.json();
     }
 }

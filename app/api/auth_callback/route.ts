@@ -29,9 +29,5 @@ export async function GET(request: NextRequest)
     await sesh.save();
     await ping("auth_callback: saved session: " + JSON.stringify(sesh));
 
-    // TODO: remove this commented out code
-    // const foo = await client.getAccounts(sesh.access_token, sesh.access_secret);
-    // await ping("auth_callback: got accounts: " + JSON.stringify(foo));
-
     return NextResponse.json({ ok: "ok"})
 }
