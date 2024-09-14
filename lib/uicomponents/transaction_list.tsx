@@ -75,10 +75,20 @@ const TransactionTable = (props: {
     }
 
     return <table className="ms-1">
+        <thead>
+        <tr>
+            <th className="ps-2">Txn. Date</th>
+            <th className="ps-2">Quantity</th>
+            <th className="ps-2">Security</th>
+            <th className="ps-2">Type</th>
+            <th className="ps-2">Amount</th>
+        </tr>
+        </thead>
         <tbody>
         {transactionList.filter(filterFunc).map((transaction) => {
             return <tr key={transaction.transactionId}>
                 <td className="ps-2">{formatDate(transaction.transactionDate)}</td>
+                <td className="ps-2 text-end">{transaction.brokerage.quantity}</td>
                 <td className="ps-2">{formatProduct(transaction.brokerage.product)}</td>
                 <td className="ps-2">{transaction.transactionType}</td>
                 <td className="ps-2 text-end">{formatCurrency(transaction.amount)}</td>
