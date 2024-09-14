@@ -3,11 +3,11 @@ export default function LoginMenu(props: { loggedIn: boolean; }) {
 
     if (!loggedIn) {
         return <ul>
-            <li><a href="/login">Login</a></li>
+            <li><a href="/nologin/login">Login</a></li>
         </ul>
     } else {
         return <ul>
-        <li><a href="/logout">Logout</a></li>
+            <li><a href="/nologin/logout">Logout</a></li>
         </ul>
     }
 }

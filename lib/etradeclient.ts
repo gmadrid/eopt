@@ -32,7 +32,7 @@ export class ETradeClient {
     // Add an optional argument, `token`, that will avoid having to pass the auth values to every API method.
     constructor(token?: OAuth.Token) {
         this.oauth = new OAuth({
-            consumer: { key: consumer_key, secret: consumer_secret },
+            consumer: {key: consumer_key, secret: consumer_secret},
             signature_method: "HMAC-SHA1",
             hash_function: hash_function_sha1
         });
@@ -41,11 +41,11 @@ export class ETradeClient {
         }
     }
 
-    async getAuthorizationUrl() : Promise<AuthorizationResponse> {
+    async getAuthorizationUrl(): Promise<AuthorizationResponse> {
         const request_data = {
             url: "https://api.etrade.com/oauth/request_token",
             method: 'GET',
-            data: { oauth_callback: "oob" }
+            data: {oauth_callback: "oob"}
         };
 
         let authorization = this.oauth.authorize(request_data);
@@ -64,8 +64,8 @@ export class ETradeClient {
             secret: urlParams.get("oauth_token_secret")!
         };
 
-        const authorizeUrl =  "https://us.etrade.com/e/t/etws/authorize";
-        const authorizeParams = new URLSearchParams({key: this.oauth.consumer.key, token: token.key });
+        const authorizeUrl = "https://us.etrade.com/e/t/etws/authorize";
+        const authorizeParams = new URLSearchParams({key: this.oauth.consumer.key, token: token.key});
         const authorizeUrlWithParams = `${authorizeUrl}?${authorizeParams.toString()}`;
 
         return {
@@ -74,7 +74,7 @@ export class ETradeClient {
         };
     }
 
-    async getAccessToken(verifier: string) : Promise<OAuth.Token> {
+    async getAccessToken(verifier: string): Promise<OAuth.Token> {
         if (!this.token) {
             throw new Error("Request token is required to get access token");
         }
@@ -85,7 +85,6 @@ export class ETradeClient {
             data: {oauth_verifier: verifier}
         };
 
-        console.log("REQUEST TOKEN: ", this.token);
         let authorization = this.oauth.authorize(request_data, this.token);
         let authHeader = this.oauth.toHeader(authorization).Authorization;
 
@@ -102,6 +101,10 @@ export class ETradeClient {
             key: urlParams.get("oauth_token")!,
             secret: urlParams.get("oauth_token_secret")!
         };
+    }
+
+    async logout() {
+        this.token = undefined;
     }
 
     // TODO: declare the Accounts type.

@@ -4,7 +4,6 @@ import OAuth from "oauth-1.0a";
 
 // TODO: gotta read this from somewhere.
 const FAKE_SESH_PASSWORD = "SESH_PASS_THIS_IS_A_BAD_PASSWORD";
-const OAUTH_HALF_COOKIE_NAME = "EOPT_HALF";
 const OAUTH_LOGGED_IN_COOKIE_NAME = "EOPT_SESH";
 
 export interface LoginSession {
@@ -14,5 +13,19 @@ export interface LoginSession {
 }
 
 export async function getLoginSession(cookies: ReadonlyRequestCookies): Promise<IronSession<LoginSession>> {
-    return await getIronSession(cookies, { password: FAKE_SESH_PASSWORD, cookieName: OAUTH_LOGGED_IN_COOKIE_NAME });
+    return await getSesh(cookies);
+}
+
+export async function killLoginSession(cookies: ReadonlyRequestCookies) {
+    let sesh = await getSesh(cookies);
+    sesh.destroy();
+}
+
+async function getSesh(cookies: ReadonlyRequestCookies): Promise<IronSession<LoginSession>> {
+    return await getIronSession(cookies, {password: FAKE_SESH_PASSWORD, cookieName: OAUTH_LOGGED_IN_COOKIE_NAME});
+}
+
+
+export function isLoggedIn(sesh: LoginSession) {
+    return sesh.token && !sesh.half_session;
 }

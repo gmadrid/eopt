@@ -1,21 +1,18 @@
 'use client';
 
-import AccountsMenu from "@/lib/uicomponents/accounts_menu";
-import PortfoliosMenu from "@/lib/uicomponents/portfolios_menu";
-import TransactionsMenu from "@/lib/uicomponents/transactions_menu";
 import LoginMenu from "@/lib/uicomponents/login_menu";
-import {LoginContext} from "@/lib/uicomponents/contexts/login_context";
 import {useContext} from "react";
+import {LoginContext} from "@/lib/uicomponents/login_context";
+import SidebarMenu from "@/lib/uicomponents/sidebar_menu";
 
 export default function Sidebar() {
-    const [isLoggedIn, setIsLoggedIn] = useContext(LoginContext);
-
+    let loggedIn = useContext(LoginContext);
     return (
         <div>
-            <AccountsMenu loggedIn={isLoggedIn}/>
-            <PortfoliosMenu loggedIn={isLoggedIn}/>
-            <TransactionsMenu loggedIn={isLoggedIn}/>
-            <LoginMenu loggedIn={isLoggedIn}/>
+            <SidebarMenu name="Accounts" href="/accounts" loggedIn={loggedIn}/>
+            <SidebarMenu name="Portfolio" href="/portfolio" loggedIn={loggedIn}/>
+            <SidebarMenu name="Transactions" href="/transactions" loggedIn={loggedIn}/>
+            <LoginMenu loggedIn={loggedIn}/>
         </div>
     );
 }

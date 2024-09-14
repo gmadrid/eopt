@@ -35,7 +35,7 @@ export default function LoginPage() {
         <Row>
             <Col xs={2}></Col>
             <Col xs={8}>
-                <Form action="/finish_login" method="GET">
+                <Form action="/nologin/finish_login" method="GET">
                     <Form.Group>
                         <Form.Label><strong>Verification Code</strong></Form.Label>
                         <Form.Control name="code" type="text" placeholder="Enter the verification code from eTrade"/>

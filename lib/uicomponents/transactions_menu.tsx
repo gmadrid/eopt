@@ -4,6 +4,7 @@ export default function TransactionsMenu(props: { loggedIn: boolean; }) {
     if (!loggedIn) {
         return <></>
     }
-
-    return <ul><li><strong>To Do</strong> Transactions Menu</li></ul>
+    return <ul>
+        <li><a href="/transactions">Transactions</a></li>
+    </ul>
 }

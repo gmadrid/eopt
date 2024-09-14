@@ -5,7 +5,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import {Col, Container, Row} from "react-bootstrap";
 import clsx from 'clsx';
 import Sidebar from "@/app/sidebar";
-import {LoginContextProvider} from "@/lib/uicomponents/contexts/login_context";
+import {headers} from "next/headers";
+import LoggedInContextComponent from "@/lib/uicomponents/login_context";
 
 const inter = Inter({subsets: ["latin"]});
 
@@ -19,11 +20,13 @@ export default function RootLayout({
                                    }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const logged_in = headers().get("X-LoggedIn") === "true";
+
     return (
         <html lang="en">
         <body className={clsx(inter.className)}>
-        <Container>
-            <LoginContextProvider>
+        <LoggedInContextComponent loggedIn={logged_in}>
+            <Container>
                 <Row>
                     <Col xs={2} className="pt-3 border-2 border-end border-black">
                         <h1>eOpt</h1>
@@ -33,8 +36,8 @@ export default function RootLayout({
                         {children}
                     </Col>
                 </Row>
-            </LoginContextProvider>
-        </Container>
+            </Container>
+        </LoggedInContextComponent>
         </body>
         </html>
     );

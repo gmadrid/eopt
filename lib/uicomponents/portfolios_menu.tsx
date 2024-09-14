@@ -4,6 +4,7 @@ export default function PortfoliosMenu(props: { loggedIn: boolean; }) {
     if (!loggedIn) {
         return <></>
     }
-
-    return <ul><li><strong>To Do</strong> Portfolios Menu</li></ul>
+    return <ul>
+        <li><a href="/portfolios">Portfolios</a></li>
+    </ul>
 }
