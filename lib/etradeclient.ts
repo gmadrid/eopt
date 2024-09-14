@@ -221,16 +221,13 @@ export class ETradeClient {
             method: 'GET',
             data: {}
         };
-        console.log("Request data url: ", request_data.url);
 
         let authorization = this.oauth.authorize(request_data, this.token);
         let authHeader = this.oauth.toHeader(authorization).Authorization;
-        console.log("Auth header: ", authHeader);
-        
+
         let request = makeRequest(request_data.url, authHeader);
         const response = await fetch(request);
         if (response.status !== 200) {
-            console.log("Response: ", JSON.stringify(response));
             throw new Error(`getTransactions failed: ${response.status}: ${response.statusText}`);
         }
 

@@ -4,7 +4,7 @@ export function formatCurrency(amount?: number, currencyCode: string = 'USD', lo
     if (amount === undefined) {
         return '';
     }
-    
+
     const formatter = new Intl.NumberFormat(locale, {
         style: 'currency',
         currency: currencyCode,
@@ -54,4 +54,10 @@ export const formatDateEtrade = (date: Date): string => {
     const day = String(date.getDate()).padStart(2, '0');
 
     return `${month}${day}${year}`;
+}
+
+export const from8601 = (dateString: string): Date => {
+    // For "date-only" dates, we need to add the timezone offset to get the correct date for localtime.
+    let utcDate = new Date(dateString);
+    return new Date(utcDate.getTime() + utcDate.getTimezoneOffset() * 60000);
 }
