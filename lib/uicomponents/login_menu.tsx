@@ -2,12 +2,12 @@ export default function LoginMenu(props: { loggedIn: boolean; }) {
     let loggedIn = props.loggedIn;
 
     if (!loggedIn) {
-        return <ul>
-            <li><a href="/nologin/login">Login</a></li>
-        </ul>
+        return <div>
+            <a href="/nologin/login">Login</a>
+        </div>
     } else {
-        return <ul>
-            <li><a href="/nologin/logout">Logout</a></li>
-        </ul>
+        return <div>
+            <a href="/nologin/logout">Logout</a>
+        </div>
     }
 }

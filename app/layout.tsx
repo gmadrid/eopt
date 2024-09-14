@@ -6,7 +6,8 @@ import {Col, Container, Row} from "react-bootstrap";
 import clsx from 'clsx';
 import Sidebar from "@/app/sidebar";
 import {headers} from "next/headers";
-import LoggedInContextComponent from "@/lib/uicomponents/login_context";
+import LoggedInContextComponent from "@/lib/uicomponents/contexts/login_context";
+import AccountContextComponent from "@/lib/uicomponents/contexts/account_context";
 
 const inter = Inter({subsets: ["latin"]});
 
@@ -20,23 +21,26 @@ export default function RootLayout({
                                    }: Readonly<{
     children: React.ReactNode;
 }>) {
+    // This gets set in the middleware if there is an auth cookie.
     const logged_in = headers().get("X-LoggedIn") === "true";
 
     return (
         <html lang="en">
         <body className={clsx(inter.className)}>
         <LoggedInContextComponent loggedIn={logged_in}>
-            <Container>
-                <Row>
-                    <Col xs={2} className="pt-3 border-2 border-end border-black">
-                        <h1>eOpt</h1>
-                        <Sidebar/>
-                    </Col>
-                    <Col xs={10} className="pt-3">
-                        {children}
-                    </Col>
-                </Row>
-            </Container>
+            <AccountContextComponent>
+                <Container>
+                    <Row>
+                        <Col xs={2} className="pt-3 border-2 border-end border-black">
+                            <h1>eOpt</h1>
+                            <Sidebar/>
+                        </Col>
+                        <Col xs={10} className="pt-3">
+                            {children}
+                        </Col>
+                    </Row>
+                </Container>
+            </AccountContextComponent>
         </LoggedInContextComponent>
         </body>
         </html>

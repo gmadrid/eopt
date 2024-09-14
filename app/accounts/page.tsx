@@ -1,44 +1,39 @@
 'use client';
 
-import React, {useEffect} from "react";
-
-interface AccountListResponse {
-    Accounts: AccountInner;
-}
-
-interface AccountInner {
-    Account: Account[];
-}
-
-interface Account {
-    accountId: string;
-    accountDesc: string;
-}
+import React, {useContext, useEffect, useState} from "react";
+import {AccountBalances} from "@/lib/etradeclient";
+import {AccountContext} from "@/lib/uicomponents/contexts/account_context";
+import TransactionList from "@/lib/uicomponents/transaction_list";
+import {formatCurrency} from "@/lib/format";
 
 export default function AccountsPage() {
-    let [accounts, setAccounts] = React.useState({} as AccountListResponse);
+    let [accountIdKey] = useContext(AccountContext);
 
+    let [accountBalances, setAccountBalances] = useState<AccountBalances | undefined>(undefined);
     useEffect(() => {
-        fetch('http://localhost:3333/api/accounts')
+        if (!accountIdKey) {
+            return;
+        }
+        fetch(`http://localhost:3333/api/balances/${accountIdKey}`)
             .then(r => r.json())
             .then(j => {
-                setAccounts(j.AccountListResponse as AccountListResponse);
+                setAccountBalances(j as AccountBalances);
             });
-    }, []);
+    }, [accountIdKey]);
 
-    console.log(`Accounts: ${JSON.stringify(accounts)}`);
-
-    if (accounts && accounts.Accounts) {
-        return <div>
-            <h1>Accounts</h1>
-            <ul>
-                {accounts.Accounts.Account.map((account: any) => {
-                    return <li key={account.accountId}> {account.accountDesc}</li>;
-                })}
-            </ul>
-        </div>;
+    if (!accountIdKey) {
+        return <><h1>No account selected</h1>
+            <p>Please select an account from the sidebar</p>
+        </>;
     }
 
-    return <h1>No accounts</h1>;
-
+    return <>
+        <div>
+            <h1>Account Details</h1>
+            <div><strong>Account Description:</strong> {accountBalances?.accountDescription}</div>
+            <div><strong>Account
+                Value:</strong> {formatCurrency(accountBalances?.Computed.RealTimeValues?.totalAccountValue)}</div>
+        </div>
+        <TransactionList></TransactionList>
+    </>;
 }

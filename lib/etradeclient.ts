@@ -16,13 +16,73 @@ interface AuthorizationResponse {
     authorize_url: string
 }
 
-function makeRequest(url: string, authString: string) {
-    return new Request(url, {
-        headers: new Headers([
-            ["Authorization", authString],
-            ["Accept", "application/json"]
-        ]),
-    });
+export interface AccountListResponse {
+    Accounts: AccountInner;
+}
+
+interface AccountInner {
+    Account: Account[];
+}
+
+export interface Account {
+    accountId: string;
+    accountIdKey: string;
+    accountDesc: string;
+}
+
+export interface AccountBalances {
+    accountId: string,
+    accountType: string,
+    optionLevel: string,
+    accountDescription: string,
+    accountMode: string,
+    Computed: ComputedBalance,
+}
+
+interface ComputedBalance {
+    RealTimeValues: RealTimeValues,
+}
+
+interface RealTimeValues {
+    totalAccountValue: number,
+    netMv: number,
+    netMvLong: number,
+    netMvShort: number,
+}
+
+export interface TransactionListResponse {
+    Transaction: Transaction[],
+}
+
+export interface Transaction {
+    transactionId: string,
+    amount: number,
+    description: string,
+    transactionType: string,
+    brokerage: Brokerage,
+    transactionDate: number,
+}
+
+export interface Brokerage {
+    product: Product,
+    quantity: number,
+    price: number,
+    fee: number,
+    displaySymbol: string,
+    settlementDate: number,
+}
+
+export interface Product {
+    symbol: string,
+    securityType: string,
+    callPut: string,
+    // This appears to be just the last two digits. The 20xx year is implied.
+    expiryYear: number,
+    // 1-indexed
+    expiryMonth: number,
+    // 1-indexed
+    expiryDay: number,
+    strikePrice: number,
 }
 
 export class ETradeClient {
@@ -103,10 +163,6 @@ export class ETradeClient {
         };
     }
 
-    async logout() {
-        this.token = undefined;
-    }
-
     // TODO: declare the Accounts type.
     async getAccounts() {
         if (!this.token) {
@@ -120,9 +176,9 @@ export class ETradeClient {
         };
 
         let authorization = this.oauth.authorize(request_data, this.token);
-        let authString = this.oauth.toHeader(authorization).Authorization;
+        let authHeader = this.oauth.toHeader(authorization).Authorization;
 
-        let request = makeRequest(request_data.url, authString);
+        let request = makeRequest(request_data.url, authHeader);
         const response = await fetch(request);
         if (response.status !== 200) {
             throw new Error(`getAccounts failed: {response.status}: {response.statusText}`);
@@ -130,4 +186,65 @@ export class ETradeClient {
 
         return await response.json();
     }
+
+    async getAccountBalances(accountIdKey: string): Promise<AccountBalances> {
+        if (!this.token) {
+            throw new Error("getAccountBalances requires access token.");
+        }
+        const request_data = {
+            url: `https://api.etrade.com/v1/accounts/${accountIdKey}/balance?instType=BROKERAGE&realTimeNAV=true`,
+            method: 'GET',
+            data: {}
+        };
+
+        let authorization = this.oauth.authorize(request_data, this.token);
+        let authHeader = this.oauth.toHeader(authorization).Authorization;
+
+        // TODO: Some DRY here
+        let request = makeRequest(request_data.url, authHeader);
+        const response = await fetch(request);
+        if (response.status !== 200) {
+            throw new Error(`getAccountBalances failed: {response.status}: {response.statusText}`);
+        }
+
+        let wrapper = await response.json();
+        return wrapper.BalanceResponse;
+    }
+
+    async getTransactions(accountIdKey: string, startDate: string, endDate: string): Promise<TransactionListResponse> {
+        if (!this.token) {
+            throw new Error("getTransactions requires access token.");
+        }
+
+        const request_data = {
+            url: `https://api.etrade.com/v1/accounts/${accountIdKey}/transactions?startDate=${startDate}&endDate=${endDate}`,
+            method: 'GET',
+            data: {}
+        };
+        console.log("Request data url: ", request_data.url);
+
+        let authorization = this.oauth.authorize(request_data, this.token);
+        let authHeader = this.oauth.toHeader(authorization).Authorization;
+        console.log("Auth header: ", authHeader);
+        
+        let request = makeRequest(request_data.url, authHeader);
+        const response = await fetch(request);
+        if (response.status !== 200) {
+            console.log("Response: ", JSON.stringify(response));
+            throw new Error(`getTransactions failed: ${response.status}: ${response.statusText}`);
+        }
+
+        let wrapper = await response.json();
+        return wrapper.TransactionListResponse as TransactionListResponse;
+    }
 }
+
+function makeRequest(url: string, authString: string) {
+    return new Request(url, {
+        headers: new Headers([
+            ["Authorization", authString],
+            ["Accept", "application/json"]
+        ]),
+    });
+}
+

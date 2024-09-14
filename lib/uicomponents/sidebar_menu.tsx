@@ -4,7 +4,7 @@ export default function SidebarMenu(props: { name: string; href: string; loggedI
     if (!loggedIn) {
         return <></>
     }
-    return <ul>
-        <li><a href={href}>{name}</a></li>
-    </ul>
+    return <div>
+        <a href={href}>{name}</a>
+    </div>
 }
