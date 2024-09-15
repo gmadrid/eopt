@@ -1,16 +1,19 @@
-import React, {useContext, useEffect} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {AccountContext} from "@/lib/uicomponents/contexts/account_context";
-import {Account, AccountListResponse} from "@/lib/etradeclient";
-import clsx from "clsx";
+import {AccountBalances, AccountListResponse} from "@/lib/etradeclient";
+import {formatCurrency} from "@/lib/format";
 
 export default function AccountsMenu(props: { loggedIn: boolean; }) {
     let loggedIn = props.loggedIn;
 
-    let [accounts, setAccounts] = React.useState({} as AccountListResponse);
     let [currentAccount, setCurrentAccount] = useContext(AccountContext);
+    // TODO: make this just be Account[] and not the AccountListResponse.
+    let [accounts, setAccounts] = React.useState({} as AccountListResponse);
+    let [accountBalances, setAccountBalances] = useState<AccountBalances | undefined>(undefined);
 
     useEffect(() => {
         if (loggedIn) {
+            // TODO: all of these raw `fetch` calls should be replaced some sort of procedural abstraction.
             fetch('http://localhost:3333/api/accounts')
                 .then(r => r.json())
                 .then(j => {
@@ -23,24 +26,34 @@ export default function AccountsMenu(props: { loggedIn: boolean; }) {
         }
     }, [loggedIn]);
 
+    useEffect(() => {
+        if (!currentAccount) {
+            return;
+        }
+        fetch(`http://localhost:3333/api/balances/${currentAccount.accountIdKey}`)
+            .then(r => r.json())
+            .then(j => {
+                setAccountBalances(j as AccountBalances);
+            });
+    }, [currentAccount]);
+
     if (!loggedIn) {
         return <></>
     }
 
-    return <div>
-        <div><strong>Accounts</strong></div>
-        {accounts && accounts.Accounts && accounts.Accounts.Account.map((account: Account) => {
-            return <div className={"ps-3"} key={account.accountId}>
-                <a className={
-                    clsx({
-                        "fw-bold": currentAccount?.accountIdKey === account.accountIdKey,
-                    })
-                } href="#"
-                   onClick={() => {
-                       setCurrentAccount && setCurrentAccount(account);
-                   }}
-                >{account.accountDesc}</a>
-            </div>;
-        })}
-    </div>;
+    return <>
+        <label htmlFor="sidebar-account-select" className={"form-label"}><strong>Account</strong></label>
+        <select id="sidebar-account-select" className={"form-select"}>
+            // TODO: onChange. Doesn't matter now, since I only have a single account. :)
+            // TODO: obscure the account number.
+            {accounts?.Accounts?.Account.map((account) => {
+                const obscured = `-${account.accountId.slice(-4)}`;
+                return <option key={account.accountId}>{account.accountDesc} {obscured}</option>;
+            })}
+        </select>
+        <div className="pt-4"><strong>Description</strong></div>
+        <div className="pt-1">{accountBalances?.accountDescription}</div>
+        <div className="pt-2"><strong>Account
+            Value:</strong> {formatCurrency(accountBalances?.Computed.RealTimeValues?.totalAccountValue)}</div>
+    </>
 }

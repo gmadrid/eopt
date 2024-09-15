@@ -18,9 +18,9 @@ export const metadata: Metadata = {
 
 const EoptNavbar = () => {
     return (
-        <Navbar expand="lg" className="bg-body-tertiary">
+        <Navbar expand="lg" className="bg-body-secondary">
             <Container fluid={true}>
-                <NavbarBrand href="#home">eOpt</NavbarBrand>
+                <NavbarBrand>eOpt</NavbarBrand>
             </Container>
         </Navbar>
 
@@ -45,11 +45,10 @@ export default function RootLayout({
                 <EoptNavbar/>
                 <Container>
                     <Row>
-                        <Col xs={2} className="pt-3 border-2 border-end border-black">
-                            <h1>eOpt</h1>
+                        <Col xs={3} className="pt-3">
                             <Sidebar/>
                         </Col>
-                        <Col xs={10} className="pt-3">
+                        <Col xs={9} className="pt-3">
                             {children}
                         </Col>
                     </Row>

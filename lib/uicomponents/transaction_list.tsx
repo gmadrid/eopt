@@ -167,8 +167,8 @@ export default function TransactionList() {
     let [endDate, setEndDate] = useState(today);
     let [filterDescription, setFilterDescription] = useState<FilterDescription>({
         showDividends: true,
-        showAdjustments: true,
-        showInterest: true,
+        showAdjustments: false,
+        showInterest: false,
         showOptionsOnly: false,
         filterSymbol: "",
     });
@@ -221,7 +221,7 @@ export default function TransactionList() {
     };
 
     return <>
-        <h2 className="pt-3">Transaction List</h2>
+        <h2 className="">Transactions</h2>
         <TransactionDatePicker startDate={startDate} endDate={endDate}
                                setStartDate={setStartDate} setEndDate={setEndDate}/>
         <TransactionSymbolPicker symbols={symbols} filterSymbol={filterDescription.filterSymbol}
