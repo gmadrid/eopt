@@ -3,6 +3,7 @@ import {AccountContext} from "@/lib/uicomponents/contexts/account_context";
 import {Transaction, TransactionListResponse} from "@/lib/etradeclient";
 import {formatCurrency, formatDate, formatDate8601, formatDateEtrade, formatProduct, from8601} from "@/lib/format";
 import {Col, Row} from "react-bootstrap";
+import clsx from "clsx";
 
 const LabelledCheck = (props: {
     label: string, checkboxId: string, checked: boolean, disabled?: boolean
@@ -85,13 +86,16 @@ const TransactionTable = (props: {
         </tr>
         </thead>
         <tbody>
-        {transactionList.filter(filterFunc).map((transaction) => {
-            return <tr key={transaction.transactionId}>
-                <td className="ps-2">{formatDate(transaction.transactionDate)}</td>
-                <td className="ps-2 text-end">{transaction.brokerage.quantity}</td>
-                <td className="ps-2">{formatProduct(transaction.brokerage.product)}</td>
-                <td className="ps-2">{transaction.transactionType}</td>
-                <td className="ps-2 text-end">{formatCurrency(transaction.amount)}</td>
+        {transactionList.filter(filterFunc).map((transaction, index) => {
+            return <tr key={transaction.transactionId}
+                       className={clsx({
+                           "bg-body-secondary": index % 2 === 0,
+                       })}>
+                <td className="ps-2 py-1">{formatDate(transaction.transactionDate)}</td>
+                <td className="ps-2 py-1 text-end">{transaction.brokerage.quantity}</td>
+                <td className="ps-2 py-1">{formatProduct(transaction.brokerage.product)}</td>
+                <td className="ps-2 py-1">{transaction.transactionType}</td>
+                <td className="px-2 py-1 text-end">{formatCurrency(transaction.amount)}</td>
             </tr>;
         })}
         </tbody>
