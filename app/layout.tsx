@@ -8,6 +8,7 @@ import Sidebar from "@/app/sidebar";
 import {headers} from "next/headers";
 import LoggedInContextComponent from "@/lib/uicomponents/contexts/login_context";
 import AccountContextComponent from "@/lib/uicomponents/contexts/account_context";
+import OptionAlerts from "@/lib/uicomponents/option_alerts";
 
 const inter = Inter({subsets: ["latin"]});
 
@@ -49,6 +50,7 @@ export default function RootLayout({
                             <Sidebar/>
                         </Col>
                         <Col xs={9} className="pt-3">
+                            <OptionAlerts/>
                             {children}
                         </Col>
                     </Row>

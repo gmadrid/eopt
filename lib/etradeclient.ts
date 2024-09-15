@@ -85,6 +85,20 @@ export interface Product {
     strikePrice: number,
 }
 
+export interface Portfolio {
+    positions: Position[],
+}
+
+export interface Position {
+    positionId: number,
+    Product: Product,
+    Complete: Complete,
+}
+
+export interface Complete {
+    baseSymbolAndPrice: string,
+}
+
 export class ETradeClient {
     oauth: OAuth;
     token?: OAuth.Token;
@@ -209,6 +223,32 @@ export class ETradeClient {
 
         let wrapper = await response.json();
         return wrapper.BalanceResponse;
+    }
+
+    async getPortfolio(accountIdKey: string): Promise<Portfolio> {
+        if (!this.token) {
+            throw new Error("getPortfolio requires access token.");
+        }
+
+        const request_data = {
+            // Is 200 big enough for my entire portfolio?
+            url: `https://api.etrade.com/v1/accounts/${accountIdKey}/portfolio?count=200&view=COMPLETE`,
+            method: 'GET',
+            data: {}
+        };
+
+        let authorization = this.oauth.authorize(request_data, this.token);
+        let authHeader = this.oauth.toHeader(authorization).Authorization;
+
+        let request = makeRequest(request_data.url, authHeader);
+        // TODO: make all fetches in this file be uncached. (Then we can cache at the client level.)
+        const response = await fetch(request);
+        if (response.status !== 200) {
+            throw new Error(`getPortfolio failed: {response.status}: {response.statusText}`);
+        }
+
+        let wrapper = await response.json();
+        return {positions: wrapper.PortfolioResponse.AccountPortfolio[0].Position as Position[]};
     }
 
     async getTransactions(accountIdKey: string, startDate: string, endDate: string): Promise<TransactionListResponse> {
