@@ -14,7 +14,11 @@ export default function AccountsMenu(props: { loggedIn: boolean; }) {
             fetch('http://localhost:3333/api/accounts')
                 .then(r => r.json())
                 .then(j => {
-                    setAccounts(j.AccountListResponse as AccountListResponse);
+                    const account_list_response = j.AccountListResponse as AccountListResponse;
+                    setAccounts(account_list_response);
+                    if (!accountIdKey && account_list_response.Accounts.Account.length > 0) {
+                        setAccountIdKey!(account_list_response.Accounts.Account[0].accountIdKey);
+                    }
                 });
         }
     }, [loggedIn]);

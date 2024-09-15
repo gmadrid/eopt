@@ -2,7 +2,7 @@ import type {Metadata} from "next";
 import {Inter} from "next/font/google";
 import "./globals.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import {Col, Container, Row} from "react-bootstrap";
+import {Col, Container, Navbar, NavbarBrand, Row} from "react-bootstrap";
 import clsx from 'clsx';
 import Sidebar from "@/app/sidebar";
 import {headers} from "next/headers";
@@ -16,6 +16,17 @@ export const metadata: Metadata = {
     description: "Most advanced options trading tool on this site",
 };
 
+const EoptNavbar = () => {
+    return (
+        <Navbar expand="lg" className="bg-body-tertiary">
+            <Container fluid={true}>
+                <NavbarBrand href="#home">eOpt</NavbarBrand>
+            </Container>
+        </Navbar>
+
+    );
+}
+
 export default function RootLayout({
                                        children,
                                    }: Readonly<{
@@ -26,9 +37,12 @@ export default function RootLayout({
 
     return (
         <html lang="en">
+        <head>
+        </head>
         <body className={clsx(inter.className)}>
         <LoggedInContextComponent loggedIn={logged_in}>
             <AccountContextComponent>
+                <EoptNavbar/>
                 <Container>
                     <Row>
                         <Col xs={2} className="pt-3 border-2 border-end border-black">
