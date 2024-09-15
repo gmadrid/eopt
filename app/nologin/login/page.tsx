@@ -22,10 +22,13 @@ export default function LoginPage() {
         <p>Before we can look at your accounts, you must authenticate with eTrade and give it permission so share
             your account info.</p>
         <p>At no point, does eOpt have access to your eTrade password, and you can revoke permission at any time.</p>
-        <p>When you click on the "Login to eTrade" button below, you will be redirected to eTrade to login and give
+        <p>When you click on the &ldquo;Login to eTrade&rdquo; button below, you will be redirected to eTrade to login
+            and give
             eTrade permission
-            to share your account data with us. After you give permission, you will land on a page titled "Complete
-            Authorization." Please enter the Verification Code into the box at the very bottom, and hit "Submit code" to
+            to share your account data with us. After you give permission, you will land on a page
+            titled &ldquo;Complete
+            Authorization.&rdquo; Please enter the Verification Code into the box at the very bottom, and
+            hit &ldquo;Submit code&rdquo; to
             complete the login.</p>
         <div>
             <Button href={authUrl} id="auth_button" variant="secondary" target="_blank"

@@ -24,7 +24,7 @@ export default function AccountsMenu(props: { loggedIn: boolean; }) {
                     }
                 });
         }
-    }, [loggedIn]);
+    }, [loggedIn, currentAccount, setCurrentAccount]);
 
     useEffect(() => {
         if (!currentAccount) {
@@ -44,8 +44,7 @@ export default function AccountsMenu(props: { loggedIn: boolean; }) {
     return <>
         <label htmlFor="sidebar-account-select" className={"form-label"}><strong>Account</strong></label>
         <select id="sidebar-account-select" className={"form-select"}>
-            // TODO: onChange. Doesn't matter now, since I only have a single account. :)
-            // TODO: obscure the account number.
+            {/* TODO: onChange. Doesn't matter now, since I only have a single account. :)*/}
             {accounts?.Accounts?.Account.map((account) => {
                 const obscured = `-${account.accountId.slice(-4)}`;
                 return <option key={account.accountId}>{account.accountDesc} {obscured}</option>;
