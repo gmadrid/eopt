@@ -34,21 +34,26 @@ const TransactionFilterPicker = (props: {
     return <Row className="my-3">
         <Col xs="auto">
             <LabelledCheck label="Show Dividends" checkboxId="filter-dividends"
-                           checked={filterDescription.showDividends}
+                           checked={filterDescription.showDividends || filterDescription.showOptionsOnly}
+                           disabled={filterDescription.showOptionsOnly}
                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
                                setFilterDescription({...filterDescription, showDividends: e.target.checked});
                            }}
             />
         </Col>
         <Col xs="auto">
-            <LabelledCheck label="Show Adjustments" checkboxId="filter-adj" checked={filterDescription.showAdjustments}
+            <LabelledCheck label="Show Adjustments" checkboxId="filter-adj"
+                           checked={filterDescription.showAdjustments && !filterDescription.showOptionsOnly}
+                           disabled={filterDescription.showOptionsOnly}
                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
                                setFilterDescription({...filterDescription, showAdjustments: e.target.checked});
                            }}
             />
         </Col>
         <Col xs="auto">
-            <LabelledCheck label="Show Interest" checkboxId="filter-int" checked={filterDescription.showInterest}
+            <LabelledCheck label="Show Interest" checkboxId="filter-int"
+                           checked={filterDescription.showInterest && !filterDescription.showOptionsOnly}
+                           disabled={filterDescription.showOptionsOnly}
                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
                                setFilterDescription({...filterDescription, showInterest: e.target.checked});
                            }}
@@ -57,7 +62,6 @@ const TransactionFilterPicker = (props: {
         <Col xs="auto">
             <LabelledCheck label="Only Options-related" checkboxId="filter-optonly"
                            checked={filterDescription.showOptionsOnly}
-                           disabled={true}
                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
                                setFilterDescription({...filterDescription, showOptionsOnly: e.target.checked});
                            }}
@@ -173,6 +177,7 @@ export default function TransactionList() {
         filterSymbol: "",
     });
     let [symbols, setSymbols] = useState<string[]>([]);
+    let [optionSymbols, setOptionSymbols] = useState<Set<string>>(new Set<string>());
 
     useEffect(() => {
         if (!currentAccount) {
@@ -191,6 +196,7 @@ export default function TransactionList() {
 
     useEffect(() => {
         let symbolSet = new Set<string>();
+        let optionSymbolSet = new Set<string>();
         // ensure that "" is in the list, so that we can clear the selection.
         symbolSet.add("");
         transactionListResponse?.Transaction.map(t => {
@@ -198,25 +204,37 @@ export default function TransactionList() {
             if (s && s !== "") {
                 symbolSet.add(s);
             }
+            if (t.brokerage?.product?.securityType === "OPTN") {
+                optionSymbolSet.add(s);
+            }
         });
         const symbols = Array.from(symbolSet).sort();
         setSymbols(symbols);
+        setOptionSymbols(optionSymbolSet);
     }, [transactionListResponse]);
 
     const filterFunc = (txn: Transaction): boolean => {
-        if (txn.transactionType === "Dividend" && !filterDescription.showDividends) {
+        // If showOptionsOnly is true, then we only show options transactions which means:
+        // - no adjustments, no interest.
+        // - dividends are okay.
+        // - only show transactions with symbols in the optionSymbols set.
+        if (filterDescription.showOptionsOnly && !optionSymbols.has(txn.brokerage.product?.symbol?.trim())) {
             return false;
         }
-        if (txn.transactionType === "Adjustment" && !filterDescription.showAdjustments) {
+
+        if (txn.transactionType === "Dividend" && (!filterDescription.showDividends && !filterDescription.showOptionsOnly)) {
             return false;
         }
-        if (txn.transactionType === "Interest" && !filterDescription.showInterest) {
+        if (txn.transactionType === "Adjustment" && (!filterDescription.showAdjustments || filterDescription.showOptionsOnly)) {
             return false;
         }
+        if (txn.transactionType === "Interest" && (!filterDescription.showInterest || filterDescription.showOptionsOnly)) {
+            return false;
+        }
+
         if (filterDescription.filterSymbol !== "" && txn.brokerage.product?.symbol?.trim() !== filterDescription.filterSymbol) {
             return false;
         }
-        // TODO: optionsOnly
         return true;
     };
 
