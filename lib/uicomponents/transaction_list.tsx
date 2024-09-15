@@ -159,15 +159,38 @@ const TransactionSymbolPicker = (props: {
     </select></div>;
 }
 
+function getPreviousSaturday(): Date {
+    const today = new Date();
+    const currentDay = today.getDay(); // 0 (Sunday) to 6 (Saturday)
+
+    // Calculate days to subtract to reach the previous Saturday
+    let daysToSubtract;
+    if (currentDay === 6) { // Today is Saturday
+        daysToSubtract = 7;
+    } else {
+        daysToSubtract = (currentDay + 1) % 7;
+    }
+
+    // Weird exception, if today is Sunday, then we want TWO Saturday's ago.
+    if (currentDay == 0) {
+        daysToSubtract += 7;
+    }
+
+    // Create a new Date object for the previous Saturday
+    const previousSaturday = new Date(today);
+    previousSaturday.setDate(today.getDate() - daysToSubtract);
+
+    return previousSaturday;
+}
+
 export default function TransactionList() {
     let [currentAccount] = useContext(AccountContext);
 
     let today = new Date();
-    // TODO: make these default dates be "this week"
-    let threeDaysAgo = new Date(today.getTime() - 3 * 24 * 60 * 60 * 1000);
+    let previousSaturday = getPreviousSaturday();
     let [transactionListResponse, setTransactionListResponse] = useState<TransactionListResponse | undefined>(undefined);
     // TODO: make sure that start < end.
-    let [startDate, setStartDate] = useState(threeDaysAgo);
+    let [startDate, setStartDate] = useState(previousSaturday);
     let [endDate, setEndDate] = useState(today);
     let [filterDescription, setFilterDescription] = useState<FilterDescription>({
         showDividends: true,
