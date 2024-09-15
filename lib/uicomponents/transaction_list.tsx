@@ -156,7 +156,7 @@ const TransactionSymbolPicker = (props: {
 }
 
 export default function TransactionList() {
-    let [accountIdKey] = useContext(AccountContext);
+    let [currentAccount] = useContext(AccountContext);
 
     let today = new Date();
     // TODO: make these default dates be "this week"
@@ -175,19 +175,19 @@ export default function TransactionList() {
     let [symbols, setSymbols] = useState<string[]>([]);
 
     useEffect(() => {
-        if (!accountIdKey) {
+        if (!currentAccount) {
             return;
         }
         if (startDate >= endDate) {
             return;
         }
-        const url = `http://localhost:3333/api/transactions/${accountIdKey}?startDate=${formatDateEtrade(startDate)}&endDate=${formatDateEtrade(endDate)}`;
+        const url = `http://localhost:3333/api/transactions/${currentAccount.accountIdKey}?startDate=${formatDateEtrade(startDate)}&endDate=${formatDateEtrade(endDate)}`;
         fetch(url)
             .then(r => r.json())
             .then(j => {
                 setTransactionListResponse(j as TransactionListResponse);
             });
-    }, [accountIdKey, startDate, endDate]);
+    }, [currentAccount, startDate, endDate]);
 
     useEffect(() => {
         let symbolSet = new Set<string>();

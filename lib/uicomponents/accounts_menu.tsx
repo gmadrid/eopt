@@ -7,7 +7,7 @@ export default function AccountsMenu(props: { loggedIn: boolean; }) {
     let loggedIn = props.loggedIn;
 
     let [accounts, setAccounts] = React.useState({} as AccountListResponse);
-    let [accountIdKey, setAccountIdKey] = useContext(AccountContext);
+    let [currentAccount, setCurrentAccount] = useContext(AccountContext);
 
     useEffect(() => {
         if (loggedIn) {
@@ -16,8 +16,8 @@ export default function AccountsMenu(props: { loggedIn: boolean; }) {
                 .then(j => {
                     const account_list_response = j.AccountListResponse as AccountListResponse;
                     setAccounts(account_list_response);
-                    if (!accountIdKey && account_list_response.Accounts.Account.length > 0) {
-                        setAccountIdKey!(account_list_response.Accounts.Account[0].accountIdKey);
+                    if (!currentAccount && account_list_response.Accounts.Account.length > 0) {
+                        setCurrentAccount!(account_list_response.Accounts.Account[0]);
                     }
                 });
         }
@@ -33,11 +33,11 @@ export default function AccountsMenu(props: { loggedIn: boolean; }) {
             return <div className={"ps-3"} key={account.accountId}>
                 <a className={
                     clsx({
-                        "fw-bold": accountIdKey === account.accountIdKey,
+                        "fw-bold": currentAccount?.accountIdKey === account.accountIdKey,
                     })
                 } href="#"
                    onClick={() => {
-                       setAccountIdKey && setAccountIdKey(account.accountIdKey);
+                       setCurrentAccount && setCurrentAccount(account);
                    }}
                 >{account.accountDesc}</a>
             </div>;
