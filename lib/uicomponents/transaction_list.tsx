@@ -22,6 +22,7 @@ interface FilterDescription {
     showAdjustments: boolean;
     showInterest: boolean;
     showOptionsOnly: boolean;
+    filterSymbol: string;
 }
 
 const TransactionFilterPicker = (props: {
@@ -80,82 +81,32 @@ const TransactionTable = (props: {
         <tr>
             <th className="ps-2">Txn. Date</th>
             <th className="ps-2">Quantity</th>
-            <th className="ps-2">Security</th>
+            <th className="ps-2">Description</th>
             <th className="ps-2">Type</th>
             <th className="ps-2">Amount</th>
         </tr>
         </thead>
         <tbody>
         {transactionList.filter(filterFunc).map((transaction, index) => {
+            // Some transactions don't have a product, show the description instead.
+            let description = formatProduct(transaction.brokerage.product);
+            if (!description || description === "") {
+                description = transaction.description;
+            }
+
             return <tr key={transaction.transactionId}
                        className={clsx({
                            "bg-body-secondary": index % 2 === 0,
                        })}>
                 <td className="ps-2 py-1">{formatDate(transaction.transactionDate)}</td>
-                <td className="ps-2 py-1 text-end">{transaction.brokerage.quantity}</td>
-                <td className="ps-2 py-1">{formatProduct(transaction.brokerage.product)}</td>
+                <td className="ps-2 py-1 text-end">{transaction.brokerage.quantity == 0 ? "" : transaction.brokerage.quantity}</td>
+                <td className="ps-2 py-1">{description}</td>
                 <td className="ps-2 py-1">{transaction.transactionType}</td>
                 <td className="px-2 py-1 text-end">{formatCurrency(transaction.amount)}</td>
             </tr>;
         })}
         </tbody>
     </table>
-}
-
-export default function TransactionList() {
-    let [accountIdKey] = useContext(AccountContext);
-
-    let today = new Date();
-    // TODO: make these default dates be "this week"
-    let threeDaysAgo = new Date(today.getTime() - 3 * 24 * 60 * 60 * 1000);
-    let [transactionListResponse, setTransactionListResponse] = useState<TransactionListResponse | undefined>(undefined);
-    // TODO: make sure that start < end.
-    let [startDate, setStartDate] = useState(threeDaysAgo);
-    let [endDate, setEndDate] = useState(today);
-    let [filterDescription, setFilterDescription] = useState<FilterDescription>({
-        showDividends: true,
-        showAdjustments: true,
-        showInterest: true,
-        showOptionsOnly: false
-    });
-
-    useEffect(() => {
-        if (!accountIdKey) {
-            return;
-        }
-        if (startDate >= endDate) {
-            return;
-        }
-        const url = `http://localhost:3333/api/transactions/${accountIdKey}?startDate=${formatDateEtrade(startDate)}&endDate=${formatDateEtrade(endDate)}`;
-        console.log("URL: ", url);
-        fetch(url)
-            .then(r => r.json())
-            .then(j => {
-                setTransactionListResponse(j as TransactionListResponse);
-            });
-    }, [accountIdKey, startDate, endDate]);
-
-    const filterFunc = (txn: Transaction): boolean => {
-        if (txn.transactionType === "Dividend" && !filterDescription.showDividends) {
-            return false;
-        }
-        if (txn.transactionType === "Adjustment" && !filterDescription.showAdjustments) {
-            return false;
-        }
-        if (txn.transactionType === "Interest" && !filterDescription.showInterest) {
-            return false;
-        }
-        // TODO: optionsOnly
-        return true;
-    };
-
-    return <>
-        <h2 className="pt-3">Transaction List</h2>
-        <TransactionDatePicker startDate={startDate} endDate={endDate}
-                               setStartDate={setStartDate} setEndDate={setEndDate}/>
-        <TransactionFilterPicker filterDescription={filterDescription} setFilterDescription={setFilterDescription}/>
-        <TransactionTable transactionList={transactionListResponse?.Transaction} filterFunc={filterFunc}/>
-    </>;
 }
 
 const TransactionDatePicker = (props: {
@@ -185,4 +136,99 @@ const TransactionDatePicker = (props: {
             />
         </div>
     </div>;
+}
+
+const TransactionSymbolPicker = (props: {
+    symbols: string[],
+    filterSymbol: string,
+    setFilterSymbol: (s: string) => void
+}): ReactNode => {
+    let {symbols, filterSymbol, setFilterSymbol} = props;
+
+    const onChange = (ev: ChangeEvent<HTMLSelectElement>) => {
+        setFilterSymbol(ev.target.value);
+    };
+
+    return <div><select className="form-select" onChange={onChange}>
+        {symbols.map(symbol => <option key={symbol} value={symbol}
+                                       selected={filterSymbol === symbol}>{symbol === "" ? "Filter by symbol" : symbol}</option>)}
+    </select></div>;
+}
+
+export default function TransactionList() {
+    let [accountIdKey] = useContext(AccountContext);
+
+    let today = new Date();
+    // TODO: make these default dates be "this week"
+    let threeDaysAgo = new Date(today.getTime() - 3 * 24 * 60 * 60 * 1000);
+    let [transactionListResponse, setTransactionListResponse] = useState<TransactionListResponse | undefined>(undefined);
+    // TODO: make sure that start < end.
+    let [startDate, setStartDate] = useState(threeDaysAgo);
+    let [endDate, setEndDate] = useState(today);
+    let [filterDescription, setFilterDescription] = useState<FilterDescription>({
+        showDividends: true,
+        showAdjustments: true,
+        showInterest: true,
+        showOptionsOnly: false,
+        filterSymbol: "",
+    });
+    let [symbols, setSymbols] = useState<string[]>([]);
+
+    useEffect(() => {
+        if (!accountIdKey) {
+            return;
+        }
+        if (startDate >= endDate) {
+            return;
+        }
+        const url = `http://localhost:3333/api/transactions/${accountIdKey}?startDate=${formatDateEtrade(startDate)}&endDate=${formatDateEtrade(endDate)}`;
+        fetch(url)
+            .then(r => r.json())
+            .then(j => {
+                setTransactionListResponse(j as TransactionListResponse);
+            });
+    }, [accountIdKey, startDate, endDate]);
+
+    useEffect(() => {
+        let symbolSet = new Set<string>();
+        // ensure that "" is in the list, so that we can clear the selection.
+        symbolSet.add("");
+        transactionListResponse?.Transaction.map(t => {
+            let s = t.brokerage?.product?.symbol?.trim();
+            if (s && s !== "") {
+                symbolSet.add(s);
+            }
+        });
+        const symbols = Array.from(symbolSet).sort();
+        setSymbols(symbols);
+    }, [transactionListResponse]);
+
+    const filterFunc = (txn: Transaction): boolean => {
+        if (txn.transactionType === "Dividend" && !filterDescription.showDividends) {
+            return false;
+        }
+        if (txn.transactionType === "Adjustment" && !filterDescription.showAdjustments) {
+            return false;
+        }
+        if (txn.transactionType === "Interest" && !filterDescription.showInterest) {
+            return false;
+        }
+        if (filterDescription.filterSymbol !== "" && txn.brokerage.product?.symbol?.trim() !== filterDescription.filterSymbol) {
+            return false;
+        }
+        // TODO: optionsOnly
+        return true;
+    };
+
+    return <>
+        <h2 className="pt-3">Transaction List</h2>
+        <TransactionDatePicker startDate={startDate} endDate={endDate}
+                               setStartDate={setStartDate} setEndDate={setEndDate}/>
+        <TransactionSymbolPicker symbols={symbols} filterSymbol={filterDescription.filterSymbol}
+                                 setFilterSymbol={(s: string) => {
+                                     setFilterDescription({...filterDescription, filterSymbol: s});
+                                 }}/>
+        <TransactionFilterPicker filterDescription={filterDescription} setFilterDescription={setFilterDescription}/>
+        <TransactionTable transactionList={transactionListResponse?.Transaction} filterFunc={filterFunc}/>
+    </>;
 }
