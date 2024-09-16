@@ -9,6 +9,8 @@ import {headers} from "next/headers";
 import LoggedInContextComponent from "@/lib/uicomponents/contexts/login_context";
 import AccountContextComponent from "@/lib/uicomponents/contexts/account_context";
 import OptionAlerts from "@/lib/uicomponents/option_alerts";
+import TabbContextComponent from "@/lib/uicomponents/contexts/tab_context";
+import TabSelector from "@/lib/uicomponents/tab_selector";
 
 const inter = Inter({subsets: ["latin"]});
 
@@ -43,18 +45,21 @@ export default function RootLayout({
         <body className={clsx(inter.className)}>
         <LoggedInContextComponent loggedIn={logged_in}>
             <AccountContextComponent>
-                <EoptNavbar/>
-                <Container>
-                    <Row>
-                        <Col xs={3} className="pt-3">
-                            <Sidebar/>
-                        </Col>
-                        <Col xs={9} className="pt-3">
-                            <OptionAlerts/>
-                            {children}
-                        </Col>
-                    </Row>
-                </Container>
+                <TabbContextComponent>
+                    <EoptNavbar/>
+                    <Container>
+                        <Row>
+                            <Col xs={3} className="pt-3">
+                                <Sidebar/>
+                            </Col>
+                            <Col xs={9} className="pt-3">
+                                <OptionAlerts/>
+                                <TabSelector/>
+                                {children}
+                            </Col>
+                        </Row>
+                    </Container>
+                </TabbContextComponent>
             </AccountContextComponent>
         </LoggedInContextComponent>
         </body>

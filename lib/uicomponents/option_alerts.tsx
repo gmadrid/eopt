@@ -97,8 +97,8 @@ const OptionAlerts = () => {
     }
 
     return (
-        <div className="mb-3 border border-2 border-black px-3 py-2 rounded-2 bg-danger-subtle">
-            <strong className="fs-4">Options to watch</strong>
+        <div className="alert alert-danger">
+            <div className="pb-2"><strong className="fs-4">Options to watch</strong></div>
             {alert_list.map(p => {
                 const pieces = p.Complete?.baseSymbolAndPrice.trim().split('/');
                 const price = formatCurrency(parseFloat(pieces[1]));
