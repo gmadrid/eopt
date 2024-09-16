@@ -86,6 +86,7 @@ const TransactionTable = (props: {
         <tr>
             <th className="ps-2">Txn. Date</th>
             <th className="ps-2">Quantity</th>
+            <th></th>
             <th className="ps-2">Description</th>
             <th className="ps-2">Type</th>
             <th className="ps-2">Amount</th>
@@ -94,6 +95,8 @@ const TransactionTable = (props: {
         <tbody>
         {transactionList.filter(filterFunc).map((transaction, index) => {
             // Some transactions don't have a product, show the description instead.
+            // This is a total hack. Fix it by adding an actual field somehow.
+            const isCombined = transaction.description.startsWith("Combined ");
             let description = formatProduct(transaction.brokerage.product);
             if (!description || description === "") {
                 description = transaction.description;
@@ -105,6 +108,7 @@ const TransactionTable = (props: {
                        })}>
                 <td className="ps-2 py-1">{formatDate(transaction.transactionDate)}</td>
                 <td className="ps-2 py-1 text-end">{transaction.brokerage.quantity == 0 ? "" : transaction.brokerage.quantity}</td>
+                <td className="ps-2 py-1">{isCombined ? "\u29C9" : ""}</td>
                 <td className="ps-2 py-1">{description}</td>
                 <td className="ps-2 py-1">{transaction.transactionType}</td>
                 <td className="px-2 py-1 text-end">{formatCurrency(transaction.amount)}</td>
@@ -293,6 +297,10 @@ export default function TransactionList() {
                 formatProduct(lastTxn.brokerage.product) === formatProduct(txn.brokerage.product)) {
                 lastTxn.amount += txn.amount;
                 lastTxn.brokerage.quantity += txn.brokerage.quantity;
+                // HACK: stop mutating the description, #23
+                if (!lastTxn.description.startsWith("Combined ")) {
+                    lastTxn.description = `Combined ${lastTxn.description}`;
+                }
             } else {
                 lastTxn = txn;
                 combined.push(txn);
