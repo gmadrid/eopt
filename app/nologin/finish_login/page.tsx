@@ -1,9 +1,11 @@
 'use client';
 
 import {redirect} from "next/navigation";
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
+import {ConfigContext} from "@/lib/uicomponents/contexts/config_context";
 
 export default function FinishLoginPage(input: any) {
+    const config = useContext(ConfigContext);
     const verifier = input.searchParams.code;
     if (!verifier) {
         redirect("/login")
@@ -18,7 +20,7 @@ export default function FinishLoginPage(input: any) {
         if (!authFinished && !done_already) {
             // Set this before the fetch to ensure that we don't run this twice.
             done_already = true;
-            fetch('http://localhost:3333/api/auth_callback?verifier=' + verifier)
+            fetch(`${config.server_self_url}api/auth_callback?verifier=${verifier}`)
                 .then(r => {
                     return r.json();
                 })
@@ -29,7 +31,7 @@ export default function FinishLoginPage(input: any) {
     }, []);
 
     if (authFinished) {
-        redirect("http://localhost:3333/");
+        redirect(`${config.server_self_url}`);
     }
 
     return <>

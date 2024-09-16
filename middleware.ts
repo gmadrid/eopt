@@ -1,6 +1,7 @@
 import {NextRequest, NextResponse} from "next/server";
 import {getLoginSession, isLoggedIn} from "@/lib/sessions";
 import {RequestCookiesAdapter} from "next/dist/server/web/spec-extension/adapters/request-cookies";
+import EoptConfig from "@/lib/eopt_config";
 
 export async function middleware(request: NextRequest) {
     let sesh = await getLoginSession(RequestCookiesAdapter.seal(request.cookies));
@@ -10,7 +11,7 @@ export async function middleware(request: NextRequest) {
         return new Response(null, {
             status: 302,
             headers: {
-                "Location": "http://localhost:3333/nologin/login"
+                "Location": `${EoptConfig.server_self_url}nologin/login`
             }
         });
     }

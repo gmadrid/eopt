@@ -2,6 +2,7 @@ import React, {useContext, useEffect, useState} from "react";
 import {AccountContext} from "@/lib/uicomponents/contexts/account_context";
 import {AccountBalances, AccountListResponse} from "@/lib/etradeclient";
 import {formatCurrency} from "@/lib/format";
+import {ConfigContext} from "@/lib/uicomponents/contexts/config_context";
 
 export default function AccountsMenu(props: { loggedIn: boolean; }) {
     let loggedIn = props.loggedIn;
@@ -9,10 +10,11 @@ export default function AccountsMenu(props: { loggedIn: boolean; }) {
     let [currentAccount, setCurrentAccount] = useContext(AccountContext);
     let [accounts, setAccounts] = React.useState({} as AccountListResponse);
     let [accountBalances, setAccountBalances] = useState<AccountBalances | undefined>(undefined);
+    let config = useContext(ConfigContext);
 
     useEffect(() => {
         if (loggedIn) {
-            fetch('http://localhost:3333/api/accounts')
+            fetch(`${config.server_self_url}api/accounts`)
                 .then(r => r.json())
                 .then(j => {
                     const account_list_response = j.AccountListResponse as AccountListResponse;

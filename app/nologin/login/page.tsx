@@ -1,14 +1,16 @@
 'use client';
 
 import {Button, Col, Form, Row} from "react-bootstrap";
-import React, {useEffect} from "react";
+import React, {useContext, useEffect} from "react";
+import {ConfigContext} from "@/lib/uicomponents/contexts/config_context";
 
 export default function LoginPage() {
     const [disabled, setDisabled] = React.useState(true);
     const [authUrl, setAuthUrl] = React.useState("");
+    const config = useContext(ConfigContext);
 
     useEffect(() => {
-        fetch('http://localhost:3333/api/auth').then(r => {
+        fetch(`${config.server_self_url}api/auth`).then(r => {
             return r.json();
         }).then(async j => {
             setAuthUrl(j.auth_url);

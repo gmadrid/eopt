@@ -5,6 +5,7 @@ import {AccountContext} from "@/lib/uicomponents/contexts/account_context";
 import {Portfolio, Position} from "@/lib/etradeclient";
 import {formatCurrency, formatProduct} from "@/lib/format";
 import clsx from "clsx";
+import {ConfigContext} from "@/lib/uicomponents/contexts/config_context";
 
 const getNextFriday = (): Date => {
     const today = new Date();
@@ -61,12 +62,13 @@ const closeToMoney = (position: Position): boolean => {
 const OptionAlerts = () => {
     let [portfolio, setPortfolio] = useState({} as Portfolio);
     let [currentAccount] = useContext(AccountContext);
+    let config = useContext(ConfigContext);
 
     useEffect(() => {
         if (!currentAccount) {
             return;
         }
-        fetch(`http://localhost:3333/api/portfolio/${currentAccount.accountIdKey}`)
+        fetch(`${config.server_self_url}api/portfolio/${currentAccount.accountIdKey}`)
             .then(r => r.json())
             .then(j => {
                 setPortfolio(j as Portfolio);

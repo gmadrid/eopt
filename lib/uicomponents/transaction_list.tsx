@@ -4,6 +4,7 @@ import {Transaction, TransactionListResponse} from "@/lib/etradeclient";
 import {formatCurrency, formatDate, formatDate8601, formatDateEtrade, formatProduct, from8601} from "@/lib/format";
 import {Col, Row} from "react-bootstrap";
 import clsx from "clsx";
+import {ConfigContext} from "@/lib/uicomponents/contexts/config_context";
 
 const LabelledCheck = (props: {
     label: string, checkboxId: string, checked: boolean, disabled?: boolean
@@ -200,6 +201,7 @@ export default function TransactionList() {
     });
     let [symbols, setSymbols] = useState<string[]>([]);
     let [optionSymbols, setOptionSymbols] = useState<Set<string>>(new Set<string>());
+    let config = useContext(ConfigContext);
 
     useEffect(() => {
         if (!currentAccount) {
@@ -208,7 +210,7 @@ export default function TransactionList() {
         if (startDate >= endDate) {
             return;
         }
-        const url = `http://localhost:3333/api/transactions/${currentAccount.accountIdKey}?startDate=${formatDateEtrade(startDate)}&endDate=${formatDateEtrade(endDate)}`;
+        const url = `${config.server_self_url}api/transactions/${currentAccount.accountIdKey}?startDate=${formatDateEtrade(startDate)}&endDate=${formatDateEtrade(endDate)}`;
         fetch(url)
             .then(r => r.json())
             .then(j => {

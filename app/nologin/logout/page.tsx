@@ -1,13 +1,15 @@
 'use client';
 
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import {redirect} from "next/navigation";
+import {ConfigContext} from "@/lib/uicomponents/contexts/config_context";
 
 export default function LoginPage() {
     let [unauth_done, setUnauthDone] = useState(false);
+    let config = useContext(ConfigContext);
 
     useEffect(() => {
-        fetch('http://localhost:3333/api/unauth').then(r => {
+        fetch(`${config.server_self_url}api/unauth`).then(r => {
             setUnauthDone(true);
             return r.json();
         });
