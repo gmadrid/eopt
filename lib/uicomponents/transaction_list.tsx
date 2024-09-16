@@ -213,8 +213,7 @@ export default function TransactionList() {
             .then(r => r.json())
             .then(j => {
                 let transaction_list_response = j as TransactionListResponse;
-                let combined = combineThings(transaction_list_response.Transaction);
-                transaction_list_response.Transaction = combined;
+                transaction_list_response.Transaction = combineThings(transaction_list_response.Transaction);
                 setTransactionListResponse(transaction_list_response);
             });
     }, [currentAccount, startDate, endDate]);
@@ -257,10 +256,8 @@ export default function TransactionList() {
             return false;
         }
 
-        if (filterDescription.filterSymbol !== "" && txn.brokerage.product?.symbol?.trim() !== filterDescription.filterSymbol) {
-            return false;
-        }
-        return true;
+        return !(filterDescription.filterSymbol !== "" && txn.brokerage.product?.symbol?.trim() !== filterDescription.filterSymbol);
+
     };
 
     const combineThings = (txns: Transaction[]): Transaction[] => {
