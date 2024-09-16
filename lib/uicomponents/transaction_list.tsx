@@ -2,9 +2,10 @@ import {ChangeEvent, ReactNode, useContext, useEffect, useState} from "react";
 import {AccountContext} from "@/lib/uicomponents/contexts/account_context";
 import {Transaction, TransactionListResponse} from "@/lib/etradeclient";
 import {formatCurrency, formatDate, formatDate8601, formatDateEtrade, formatProduct, from8601} from "@/lib/format";
-import {Col, Row} from "react-bootstrap";
+import {Col, OverlayTrigger, Row, Tooltip} from "react-bootstrap";
 import clsx from "clsx";
 import {ConfigContext} from "@/lib/uicomponents/contexts/config_context";
+import {OverlayInjectedProps} from "react-bootstrap/Overlay";
 
 const LabelledCheck = (props: {
     label: string, checkboxId: string, checked: boolean, disabled?: boolean
@@ -110,7 +111,7 @@ const TransactionTable = (props: {
                        })}>
                 <td className="ps-2 py-1">{formatDate(transaction.transactionDate)}</td>
                 <td className="ps-2 py-1 text-end">{transaction.brokerage.quantity == 0 ? "" : transaction.brokerage.quantity}</td>
-                <td className="ps-2 py-1 text-danger">{transaction.combined ? <strong>{"\u29C9"}</strong> : ""}</td>
+                <td className="ps-2 py-1 text-danger"><CombinedWithOverlay show={transaction.combined ?? false}/></td>
                 <td className="ps-2 py-1">{description}</td>
                 <td className="ps-2 py-1">{transaction.transactionType}</td>
                 <td className="px-2 py-1 text-end">{formatCurrency(transaction.amount)}</td>
@@ -119,6 +120,26 @@ const TransactionTable = (props: {
         </tbody>
     </table>
 }
+
+const CombinedWithOverlay = (props: {
+    show: boolean,
+}) => {
+    if (!props.show) {
+        return <></>;
+    }
+
+    const renderTooltip = (injectedProps: OverlayInjectedProps): ReactNode => {
+        return <Tooltip id="overlay-tooltip"{...injectedProps}>
+            This transaction is a combination of multiple transactions.
+        </Tooltip>
+    }
+
+    return <OverlayTrigger overlay={renderTooltip} placement="right">
+        <strong>
+            {"\u29c9"}
+        </strong>
+    </OverlayTrigger>
+};
 
 const TransactionDatePicker = (props: {
     startDate: Date, endDate: Date,
