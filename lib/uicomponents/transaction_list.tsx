@@ -171,8 +171,8 @@ function getPreviousSaturday(): Date {
         daysToSubtract = (currentDay + 1) % 7;
     }
 
-    // Weird exception, if today is Sunday, then we want TWO Saturday's ago.
-    if (currentDay == 0) {
+    // Weird exception, if today is Sunday or Monday, then we want TWO Saturday's ago.
+    if (currentDay == 0 || currentDay == 1) {
         daysToSubtract += 7;
     }
 
