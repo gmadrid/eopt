@@ -75,7 +75,7 @@ const TransactionFilterPicker = (props: {
 
 const TransactionTable = (props: {
     transactionList: Transaction[] | undefined,
-    filterFunc: (t: Transaction) => boolean
+    filterFunc: (t: Transaction) => boolean,
 }): ReactNode => {
     let {transactionList, filterFunc} = props;
 
@@ -196,7 +196,7 @@ function getPreviousSaturday(): Date {
         daysToSubtract = (currentDay + 1) % 7;
     }
 
-    // Weird exception, if today is Sunday or Monday, then we want TWO Saturday's ago.
+    // Weird exception, if today is Sunday or Monday, then we want TWO Saturdays ago.
     if (currentDay == 0 || currentDay == 1) {
         daysToSubtract += 7;
     }
@@ -226,6 +226,7 @@ export default function TransactionList() {
     let [symbols, setSymbols] = useState<string[]>([]);
     let [optionSymbols, setOptionSymbols] = useState<Set<string>>(new Set<string>());
     let config = useContext(ConfigContext);
+    let [combine, setCombine] = useState<boolean>(true);
 
     useEffect(() => {
         if (!currentAccount) {
@@ -239,10 +240,12 @@ export default function TransactionList() {
             .then(r => r.json())
             .then(j => {
                 let transaction_list_response = j as TransactionListResponse;
-                transaction_list_response.Transaction = combineTransactions(transaction_list_response.Transaction);
+                if (combine) {
+                    transaction_list_response.Transaction = combineTransactions(transaction_list_response.Transaction);
+                }
                 setTransactionListResponse(transaction_list_response);
             });
-    }, [currentAccount, startDate, endDate]);
+    }, [currentAccount, startDate, endDate, combine]);
 
     useEffect(() => {
         let symbolSet = new Set<string>();
@@ -292,6 +295,10 @@ export default function TransactionList() {
                                  setFilterSymbol={(s: string) => {
                                      setFilterDescription({...filterDescription, filterSymbol: s});
                                  }}/>
+        <LabelledCheck label="Combine similar transactions" checkboxId="combined_checkbox" checked={combine}
+                       onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                           setCombine(e.target.checked);
+                       }}/>
         <TransactionFilterPicker filterDescription={filterDescription} setFilterDescription={setFilterDescription}/>
         <TransactionTable transactionList={transactionListResponse?.Transaction} filterFunc={filterFunc}/>
     </>;
