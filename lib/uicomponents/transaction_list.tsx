@@ -213,7 +213,11 @@ export default function TransactionList() {
         fetch(url)
             .then(r => r.json())
             .then(j => {
-                setTransactionListResponse(j as TransactionListResponse);
+                let transaction_list_response = j as TransactionListResponse;
+                // TODO: add a flag to combine transactions.
+                let combined = combineThings(transaction_list_response.Transaction);
+                transaction_list_response.Transaction = combined;
+                setTransactionListResponse(transaction_list_response);
             });
     }, [currentAccount, startDate, endDate]);
 
@@ -261,8 +265,51 @@ export default function TransactionList() {
         return true;
     };
 
+    const combineThings = (txns: Transaction[]): Transaction[] => {
+        let combined: Transaction[] = [];
+
+        txns.sort((t1, t2) => {
+            // We are reverse sorting by date.
+            const dateCmp = t1.transactionDate - t2.transactionDate;
+            if (dateCmp !== 0) {
+                return -dateCmp;
+            }
+
+            // TODO: this is pretty inefficient. Make it better.
+            const t1product = formatProduct(t1.brokerage.product);
+            const t2product = formatProduct(t2.brokerage.product);
+            if (t1product === undefined && t2product === undefined) {
+                return 0;
+            }
+            if (t1product === undefined) {
+                return -1;
+            }
+            if (t2product === undefined) {
+                return 1;
+            }
+            return t1product.localeCompare(t2product);
+        });
+
+        let lastTxn: (Transaction | undefined) = undefined;
+        txns.forEach(txn => {
+            // TODO: this is pretty inefficient. Make it better.
+            if (lastTxn &&
+                lastTxn.transactionDate === txn.transactionDate &&
+                lastTxn.brokerage?.product &&
+                formatProduct(lastTxn.brokerage.product) === formatProduct(txn.brokerage.product)) {
+                lastTxn.amount += txn.amount;
+                lastTxn.brokerage.quantity += txn.brokerage.quantity;
+            } else {
+                lastTxn = txn;
+                combined.push(txn);
+            }
+        });
+        // TODO: when a transaction is combined, we should indicate this in the transaction table.
+        return combined;
+    }
+
+
     return <>
-        <h2 className="">Transactions</h2>
         <TransactionDatePicker startDate={startDate} endDate={endDate}
                                setStartDate={setStartDate} setEndDate={setEndDate}/>
         <TransactionSymbolPicker symbols={symbols} filterSymbol={filterDescription.filterSymbol}
