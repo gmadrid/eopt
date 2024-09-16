@@ -107,11 +107,16 @@ const OptionAlerts = () => {
                 const in_the_money = inTheMoney(p);
                 const close_to_money = closeToMoney(p);
 
+                let alert = in_the_money;
+                let warning = close_to_money && !in_the_money;
+                let info = !close_to_money && !in_the_money;
+                let prefix = in_the_money ? "Alert — In the money: " : close_to_money ? "Warning — Close to money: " : "";
+
                 return <div className={clsx("fw-bold", "fs-5", {
-                    'text-danger': in_the_money,
-                    'text-success': !in_the_money,
-                    'text-warning': close_to_money && !in_the_money,
-                })}>{formatProduct(p.Product)} - {price}</div>
+                    'text-danger': alert,
+                    'text-primary': warning,
+                    'text-secondary': info,
+                })}>{prefix}{formatProduct(p.Product)} - {price}</div>
             })}
         </div>
     );
