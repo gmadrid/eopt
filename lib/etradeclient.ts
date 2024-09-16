@@ -16,6 +16,10 @@ interface AuthorizationResponse {
     authorize_url: string
 }
 
+export interface AccountListResponseWrapper {
+    AccountListResponse: AccountListResponse;
+}
+
 export interface AccountListResponse {
     Accounts: AccountInner;
 }
@@ -28,6 +32,10 @@ export interface Account {
     accountId: string;
     accountIdKey: string;
     accountDesc: string;
+}
+
+export interface AccountBalanceResponse {
+    BalanceResponse: AccountBalances,
 }
 
 export interface AccountBalances {
@@ -48,6 +56,10 @@ interface RealTimeValues {
     netMv: number,
     netMvLong: number,
     netMvShort: number,
+}
+
+export interface TransactionListResponseWrapper {
+    TransactionListResponse: TransactionListResponse
 }
 
 export interface TransactionListResponse {
@@ -83,6 +95,18 @@ export interface Product {
     // 1-indexed
     expiryDay: number,
     strikePrice: number,
+}
+
+interface PortfolioResponseWrapper {
+    PortfolioResponse: PortfolioResponse,
+}
+
+interface PortfolioResponse {
+    AccountPortfolio: AccountPortfolio[],
+}
+
+interface AccountPortfolio {
+    Position: Position[],
 }
 
 export interface Portfolio {
@@ -177,13 +201,13 @@ export class ETradeClient {
         };
     }
 
-    async getAccounts() {
+    async getJsonResponse<T>(name: string, url: string): Promise<T> {
         if (!this.token) {
-            throw new Error("getAccounts requires access token.");
+            throw new Error(`${name} requires access token.`);
         }
 
         const request_data = {
-            url: "https://api.etrade.com/v1/accounts/list",
+            url: url,
             method: 'GET',
             data: {}
         };
@@ -194,82 +218,39 @@ export class ETradeClient {
         let request = makeRequest(request_data.url, authHeader);
         const response = await fetch(request);
         if (response.status !== 200) {
-            throw new Error(`getAccounts failed: {response.status}: {response.statusText}`);
+            throw new Error(`${name} failed: ${response.status}: ${response.statusText}`);
         }
 
-        return await response.json();
+        return await response.json() as T;
+    }
+
+    async getAccounts(): Promise<AccountListResponseWrapper> {
+        return await this.getJsonResponse(
+            "getAccounts",
+            "https://api.etrade.com/v1/accounts/list"
+        );
     }
 
     async getAccountBalances(accountIdKey: string): Promise<AccountBalances> {
-        if (!this.token) {
-            throw new Error("getAccountBalances requires access token.");
-        }
-        const request_data = {
-            url: `https://api.etrade.com/v1/accounts/${accountIdKey}/balance?instType=BROKERAGE&realTimeNAV=true`,
-            method: 'GET',
-            data: {}
-        };
-
-        let authorization = this.oauth.authorize(request_data, this.token);
-        let authHeader = this.oauth.toHeader(authorization).Authorization;
-
-        let request = makeRequest(request_data.url, authHeader);
-        const response = await fetch(request);
-        if (response.status !== 200) {
-            throw new Error(`getAccountBalances failed: {response.status}: {response.statusText}`);
-        }
-
-        let wrapper = await response.json();
+        const wrapper = await this.getJsonResponse<AccountBalanceResponse>(
+            "getAccountBalances",
+            `https://api.etrade.com/v1/accounts/${accountIdKey}/balance?instType=BROKERAGE&realTimeNAV=true`);
         return wrapper.BalanceResponse;
     }
 
     async getPortfolio(accountIdKey: string): Promise<Portfolio> {
-        if (!this.token) {
-            throw new Error("getPortfolio requires access token.");
-        }
-
-        const request_data = {
-            // Is 200 big enough for my entire portfolio?
-            url: `https://api.etrade.com/v1/accounts/${accountIdKey}/portfolio?count=200&view=COMPLETE`,
-            method: 'GET',
-            data: {}
-        };
-
-        let authorization = this.oauth.authorize(request_data, this.token);
-        let authHeader = this.oauth.toHeader(authorization).Authorization;
-
-        let request = makeRequest(request_data.url, authHeader);
-        const response = await fetch(request);
-        if (response.status !== 200) {
-            throw new Error(`getPortfolio failed: {response.status}: {response.statusText}`);
-        }
-
-        let wrapper = await response.json();
-        return {positions: wrapper.PortfolioResponse.AccountPortfolio[0].Position as Position[]};
+        const wrapper = await this.getJsonResponse<PortfolioResponseWrapper>(
+            "getPortfolio",
+            `https://api.etrade.com/v1/accounts/${accountIdKey}/portfolio?count=200&view=COMPLETE`);
+        return {positions: wrapper.PortfolioResponse.AccountPortfolio[0].Position};
     }
 
     async getTransactions(accountIdKey: string, startDate: string, endDate: string): Promise<TransactionListResponse> {
-        if (!this.token) {
-            throw new Error("getTransactions requires access token.");
-        }
-
-        const request_data = {
-            url: `https://api.etrade.com/v1/accounts/${accountIdKey}/transactions?startDate=${startDate}&endDate=${endDate}`,
-            method: 'GET',
-            data: {}
-        };
-
-        let authorization = this.oauth.authorize(request_data, this.token);
-        let authHeader = this.oauth.toHeader(authorization).Authorization;
-
-        let request = makeRequest(request_data.url, authHeader);
-        const response = await fetch(request);
-        if (response.status !== 200) {
-            throw new Error(`getTransactions failed: ${response.status}: ${response.statusText}`);
-        }
-
-        let wrapper = await response.json();
-        return wrapper.TransactionListResponse as TransactionListResponse;
+        const wrapper = await this.getJsonResponse<TransactionListResponseWrapper>(
+            "getTransactions",
+            `https://api.etrade.com/v1/accounts/${accountIdKey}/transactions?startDate=${startDate}&endDate=${endDate}`
+        );
+        return wrapper.TransactionListResponse;
     }
 }
 
