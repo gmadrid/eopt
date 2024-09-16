@@ -42,7 +42,7 @@ A possible OAuth 1.0 solution: https://www.npmjs.com/package/oauth-1.0a
 - [x] Login to eTrade
 - [x] Display transactions (that I care about) since a date
     - [x] filter by symbol
-    - [ ] combine similar transactions
+    - [x] combine similar transactions
     - [x] date filter
 - [ ] For an assignment, show the adjusted cost basis
 - [ ] Alert about in-the-money options due in the next "period" (week, fortnight, month, year, all-time)
