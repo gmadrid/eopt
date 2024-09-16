@@ -6,6 +6,7 @@ import {Col, OverlayTrigger, Row, Tooltip} from "react-bootstrap";
 import clsx from "clsx";
 import {ConfigContext} from "@/lib/uicomponents/contexts/config_context";
 import {OverlayInjectedProps} from "react-bootstrap/Overlay";
+import combineTransactions, {CombinedTransaction} from "@/lib/combine";
 
 const LabelledCheck = (props: {
     label: string, checkboxId: string, checked: boolean, disabled?: boolean
@@ -25,10 +26,6 @@ interface FilterDescription {
     showInterest: boolean;
     showOptionsOnly: boolean;
     filterSymbol: string;
-}
-
-interface CombinedTransaction {
-    combined: boolean | undefined,
 }
 
 const TransactionFilterPicker = (props: {
@@ -242,7 +239,7 @@ export default function TransactionList() {
             .then(r => r.json())
             .then(j => {
                 let transaction_list_response = j as TransactionListResponse;
-                transaction_list_response.Transaction = combineThings(transaction_list_response.Transaction);
+                transaction_list_response.Transaction = combineTransactions(transaction_list_response.Transaction);
                 setTransactionListResponse(transaction_list_response);
             });
     }, [currentAccount, startDate, endDate]);
@@ -287,48 +284,6 @@ export default function TransactionList() {
 
         return !(filterDescription.filterSymbol !== "" && txn.brokerage.product?.symbol?.trim() !== filterDescription.filterSymbol);
     };
-
-    const combineThings = (txns: Transaction[]): (Transaction & CombinedTransaction)[] => {
-        let combined: Transaction[] = [];
-
-        txns.sort((t1, t2) => {
-            // We are reverse sorting by date.
-            const dateCmp = t1.transactionDate - t2.transactionDate;
-            if (dateCmp !== 0) {
-                return -dateCmp;
-            }
-
-            const t1product = formatProduct(t1.brokerage.product);
-            const t2product = formatProduct(t2.brokerage.product);
-            if (t1product === undefined && t2product === undefined) {
-                return 0;
-            }
-            if (t1product === undefined) {
-                return -1;
-            }
-            if (t2product === undefined) {
-                return 1;
-            }
-            return t1product.localeCompare(t2product);
-        });
-
-        let lastTxn: (Transaction | undefined) = undefined;
-        txns.forEach(txn => {
-            if (lastTxn &&
-                lastTxn.transactionDate === txn.transactionDate &&
-                lastTxn.brokerage?.product &&
-                formatProduct(lastTxn.brokerage.product) === formatProduct(txn.brokerage.product)) {
-                lastTxn.amount += txn.amount;
-                lastTxn.brokerage.quantity += txn.brokerage.quantity;
-                (lastTxn as Transaction & CombinedTransaction).combined = true;
-            } else {
-                lastTxn = txn;
-                combined.push(txn);
-            }
-        });
-        return combined as (Transaction & CombinedTransaction)[];
-    }
-
 
     return <>
         <TransactionDatePicker startDate={startDate} endDate={endDate}
