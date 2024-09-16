@@ -83,7 +83,7 @@ const OptionAlerts = () => {
             .filter(p => p.Product.securityType === "OPTN")
             .filter(p => inTheMoney(p) || closeToMoney(p))
             .filter(p => {
-                // TODO: move this logic somewhere to be reused.
+                // This is code that should be pulled out somewhere. Issue #3.
                 const expiry = new Date(p.Product.expiryYear, p.Product.expiryMonth - 1, p.Product.expiryDay);
                 return expiry <= next_friday;
             }).sort((a, b) => {

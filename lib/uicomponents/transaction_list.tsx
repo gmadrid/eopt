@@ -189,7 +189,6 @@ export default function TransactionList() {
     let today = new Date();
     let previousSaturday = getPreviousSaturday();
     let [transactionListResponse, setTransactionListResponse] = useState<TransactionListResponse | undefined>(undefined);
-    // TODO: make sure that start < end.
     let [startDate, setStartDate] = useState(previousSaturday);
     let [endDate, setEndDate] = useState(today);
     let [filterDescription, setFilterDescription] = useState<FilterDescription>({
@@ -214,7 +213,6 @@ export default function TransactionList() {
             .then(r => r.json())
             .then(j => {
                 let transaction_list_response = j as TransactionListResponse;
-                // TODO: add a flag to combine transactions.
                 let combined = combineThings(transaction_list_response.Transaction);
                 transaction_list_response.Transaction = combined;
                 setTransactionListResponse(transaction_list_response);
@@ -275,7 +273,6 @@ export default function TransactionList() {
                 return -dateCmp;
             }
 
-            // TODO: this is pretty inefficient. Make it better.
             const t1product = formatProduct(t1.brokerage.product);
             const t2product = formatProduct(t2.brokerage.product);
             if (t1product === undefined && t2product === undefined) {
@@ -292,7 +289,6 @@ export default function TransactionList() {
 
         let lastTxn: (Transaction | undefined) = undefined;
         txns.forEach(txn => {
-            // TODO: this is pretty inefficient. Make it better.
             if (lastTxn &&
                 lastTxn.transactionDate === txn.transactionDate &&
                 lastTxn.brokerage?.product &&
@@ -304,7 +300,6 @@ export default function TransactionList() {
                 combined.push(txn);
             }
         });
-        // TODO: when a transaction is combined, we should indicate this in the transaction table.
         return combined;
     }
 

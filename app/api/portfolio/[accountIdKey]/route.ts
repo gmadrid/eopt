@@ -3,7 +3,6 @@ import {getLoginSession} from "@/lib/sessions";
 import {cookies} from "next/headers";
 import {ETradeClient} from "@/lib/etradeclient";
 
-// TODO: probably delete this.
 export async function GET(request: NextRequest,
                           {params}: { params: { accountIdKey: string } }) {
     const accountIdKey = params.accountIdKey;

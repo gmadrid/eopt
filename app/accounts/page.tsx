@@ -9,7 +9,6 @@ import ResearchTab from "@/lib/uicomponents/research_tab";
 export default function AccountsPage() {
     const [tab] = useContext(TabbContext);
 
-    // TODO: move this to '/'
     return <>
         {tab === "transactions" && <TransactionList></TransactionList>}
         {tab === "options" && <OptionsTab></OptionsTab>}

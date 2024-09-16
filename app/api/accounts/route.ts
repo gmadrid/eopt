@@ -5,7 +5,6 @@ import {cookies} from "next/headers";
 
 export async function GET(request: NextRequest) {
     const sesh = await getLoginSession(cookies());
-    // TODO: move this into a class behavior.
     if (!sesh.token || sesh.half_session) {
         return NextResponse.json({error: "not logged in"});
     }

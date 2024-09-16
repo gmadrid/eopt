@@ -10,7 +10,6 @@ export async function middleware(request: NextRequest) {
         return new Response(null, {
             status: 302,
             headers: {
-                // TODO: remove (or parameterize) hostname
                 "Location": "http://localhost:3333/nologin/login"
             }
         });
@@ -26,6 +25,6 @@ export async function middleware(request: NextRequest) {
 
 
 export const config = {
-    // TODO: make this exclude static paths and api paths and anything under '/nologin'.
+    // make this exclude static paths and api paths and anything under '/nologin'.
     matcher: ['/((?!api|nologin|ping|_next/static|_next/image|favicon.ico).*)']
 }

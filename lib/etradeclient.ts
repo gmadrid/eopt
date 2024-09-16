@@ -177,7 +177,6 @@ export class ETradeClient {
         };
     }
 
-    // TODO: declare the Accounts type.
     async getAccounts() {
         if (!this.token) {
             throw new Error("getAccounts requires access token.");
@@ -214,7 +213,6 @@ export class ETradeClient {
         let authorization = this.oauth.authorize(request_data, this.token);
         let authHeader = this.oauth.toHeader(authorization).Authorization;
 
-        // TODO: Some DRY here
         let request = makeRequest(request_data.url, authHeader);
         const response = await fetch(request);
         if (response.status !== 200) {
@@ -241,7 +239,6 @@ export class ETradeClient {
         let authHeader = this.oauth.toHeader(authorization).Authorization;
 
         let request = makeRequest(request_data.url, authHeader);
-        // TODO: make all fetches in this file be uncached. (Then we can cache at the client level.)
         const response = await fetch(request);
         if (response.status !== 200) {
             throw new Error(`getPortfolio failed: {response.status}: {response.statusText}`);

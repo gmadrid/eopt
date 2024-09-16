@@ -8,7 +8,6 @@ export default function LoginPage() {
     const [authUrl, setAuthUrl] = React.useState("");
 
     useEffect(() => {
-        // TODO: this should be part of the API object.
         fetch('http://localhost:3333/api/auth').then(r => {
             return r.json();
         }).then(async j => {

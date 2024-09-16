@@ -2,7 +2,6 @@ import {getIronSession, IronSession} from "iron-session";
 import {ReadonlyRequestCookies} from "next/dist/server/web/spec-extension/adapters/request-cookies";
 import OAuth from "oauth-1.0a";
 
-// TODO: gotta read this from somewhere.
 const FAKE_SESH_PASSWORD = "SESH_PASS_THIS_IS_A_BAD_PASSWORD";
 const OAUTH_LOGGED_IN_COOKIE_NAME = "EOPT_SESH";
 
