@@ -1,8 +1,8 @@
 import {getIronSession, IronSession} from "iron-session";
 import {ReadonlyRequestCookies} from "next/dist/server/web/spec-extension/adapters/request-cookies";
 import OAuth from "oauth-1.0a";
+import EoptConfig from "@/lib/eopt_config";
 
-const FAKE_SESH_PASSWORD = "SESH_PASS_THIS_IS_A_BAD_PASSWORD";
 const OAUTH_LOGGED_IN_COOKIE_NAME = "EOPT_SESH";
 
 export interface LoginSession {
@@ -21,7 +21,10 @@ export async function killLoginSession(cookies: ReadonlyRequestCookies) {
 }
 
 async function getSesh(cookies: ReadonlyRequestCookies): Promise<IronSession<LoginSession>> {
-    return await getIronSession(cookies, {password: FAKE_SESH_PASSWORD, cookieName: OAUTH_LOGGED_IN_COOKIE_NAME});
+    return await getIronSession(cookies, {
+        password: EoptConfig.session_cookie_password,
+        cookieName: OAUTH_LOGGED_IN_COOKIE_NAME
+    });
 }
 
 

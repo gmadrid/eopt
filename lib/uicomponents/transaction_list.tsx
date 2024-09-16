@@ -257,7 +257,6 @@ export default function TransactionList() {
         }
 
         return !(filterDescription.filterSymbol !== "" && txn.brokerage.product?.symbol?.trim() !== filterDescription.filterSymbol);
-
     };
 
     const combineThings = (txns: Transaction[]): Transaction[] => {
