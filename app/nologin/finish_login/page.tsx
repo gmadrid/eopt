@@ -3,8 +3,10 @@
 import {redirect} from "next/navigation";
 import {useContext, useEffect, useState} from "react";
 import {ConfigContext} from "@/lib/uicomponents/contexts/config_context";
+import {LoginContext} from "@/lib/uicomponents/contexts/login_context";
 
 export default function FinishLoginPage(input: any) {
+    const [_loggedIn, setLoggedIn] = useContext(LoginContext);
     const config = useContext(ConfigContext);
     const verifier = input.searchParams.code;
     if (!verifier) {
@@ -24,8 +26,9 @@ export default function FinishLoginPage(input: any) {
                 .then(r => {
                     return r.json();
                 })
-                .then(async j => {
+                .then(async _j => {
                     setAuthFinished(true);
+                    setLoggedIn(true);
                 });
         }
     }, []);

@@ -6,7 +6,7 @@ import AccountsMenu from "@/lib/uicomponents/accounts_menu";
 import clsx from "clsx";
 
 export default function Sidebar() {
-    let loggedIn = useContext(LoginContext);
+    let [loggedIn] = useContext(LoginContext);
     return (
         <div className={clsx(
             "bg-body-secondary",

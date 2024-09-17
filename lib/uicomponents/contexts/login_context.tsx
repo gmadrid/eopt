@@ -1,11 +1,16 @@
 'use client';
 
-import {createContext} from "react";
+import {createContext, ReactNode, useState} from "react";
 
-export let LoginContext = createContext(false);
+type LoginContextType = [boolean, (loggedIn: boolean) => void];
 
-export default function LoggedInContextComponent(props: { loggedIn: boolean; children: React.ReactNode; }) {
-    return <LoginContext.Provider value={props.loggedIn}>
+export let LoginContext = createContext<LoginContextType>([false, (_b) => {
+}]);
+
+export default function LoggedInContextComponent(props: { loggedIn: boolean; children: ReactNode; }) {
+    const [loggedIn, setLoggedIn] = useState(props.loggedIn);
+
+    return <LoginContext.Provider value={[loggedIn, setLoggedIn]}>
         {props.children}
     </LoginContext.Provider>
 }

@@ -50,3 +50,22 @@ A possible OAuth 1.0 solution: https://www.npmjs.com/package/oauth-1.0a
 - [ ] For a symbol, suggest possible weekly spreads with costs and "weeks to recovery"
 - [ ] For a roll, show total profit/loss
 
+So, for the Options screen, I think I want to:
+
+- show current options holdings and stocks that are associated
+- grouped by stock
+- show current prices for all securities
+- visibly group offsetting stocks
+
+- when a security is selected,
+  show profit/loss for each option group if left to expiration
+- show profit/loss for each option group if sold now
+- show some possible rolls
+    - next week, two weeks
+    - up/down to the current stock prices
+    - down/up to one or two in the other direction
+    - show total prices
+    - show gains/losses as percentage (of what?)
+    - one day, maybe link to an order on the eTrade site
+
+
