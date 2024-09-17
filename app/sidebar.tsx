@@ -7,6 +7,10 @@ import clsx from "clsx";
 
 export default function Sidebar() {
     let [loggedIn] = useContext(LoginContext);
+    if (!loggedIn) {
+        return <></>;
+    }
+    
     return (
         <div className={clsx(
             "bg-body-secondary",
