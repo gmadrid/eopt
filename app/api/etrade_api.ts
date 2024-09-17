@@ -3,7 +3,7 @@
 /// Client-side code to call the eTrade API.
 
 import {formatDateEtrade} from "@/lib/format";
-import {AccountBalances, AccountListResponse, Portfolio, TransactionListResponse} from "@/lib/etradeclient";
+import {Account, AccountBalances, AccountListResponse, Portfolio, TransactionListResponse} from "@/lib/etradeclient";
 import combineTransactions from "@/lib/combine";
 
 export class ETradeClientAPI {
@@ -17,10 +17,10 @@ export class ETradeClientAPI {
         await fetch(`${this.api_url_prefix}api/ping?m=` + msg);
     }
 
-    async getAccounts(): Promise<AccountListResponse> {
+    async getAccounts(): Promise<Account[]> {
         return fetch(`${this.api_url_prefix}api/accounts`)
             .then(r => r.json())
-            .then(j => j.AccountListResponse as AccountListResponse);
+            .then(j => (j.AccountListResponse as AccountListResponse).Accounts.Account);
     }
 
     async getAuthUrl(): Promise<string> {
