@@ -205,7 +205,7 @@ export class ETradeClient {
         };
     }
 
-    async getJsonResponse<T>(name: string, url: string): Promise<T> {
+    async getJsonResponse<T>(name: string, url: string, handle204?: () => T): Promise<T> {
         if (!this.token) {
             throw new Error(`${name} requires access token.`);
         }
@@ -221,6 +221,9 @@ export class ETradeClient {
 
         let request = makeRequest(request_data.url, authHeader);
         const response = await fetch(request);
+        if (response.status === 204) {
+            return handle204();
+        }
         if (response.status !== 200) {
             throw new Error(`${name} failed: ${response.status}: ${response.statusText}`);
         }
@@ -252,7 +255,8 @@ export class ETradeClient {
     async getTransactions(accountIdKey: string, startDate: string, endDate: string): Promise<TransactionListResponse> {
         const wrapper = await this.getJsonResponse<TransactionListResponseWrapper>(
             "getTransactions",
-            `https://api.etrade.com/v1/accounts/${accountIdKey}/transactions?startDate=${startDate}&endDate=${endDate}`
+            `https://api.etrade.com/v1/accounts/${accountIdKey}/transactions?startDate=${startDate}&endDate=${endDate}`,
+            () => ({TransactionListResponse: {Transaction: []}})
         );
         return wrapper.TransactionListResponse;
     }
