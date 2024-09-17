@@ -2,7 +2,7 @@
 
 import {useContext, useEffect, useState} from "react";
 import {AccountContext} from "@/lib/uicomponents/contexts/account_context";
-import {Portfolio, Position} from "@/lib/etradeclient";
+import {expirationDate, Portfolio, Position} from "@/lib/etradeclient";
 import {formatCurrency, formatProduct} from "@/lib/format";
 import clsx from "clsx";
 import {ConfigContext} from "@/lib/uicomponents/contexts/config_context";
@@ -85,9 +85,7 @@ const OptionAlerts = () => {
             .filter(p => p.Product.securityType === "OPTN")
             .filter(p => inTheMoney(p) || closeToMoney(p))
             .filter(p => {
-                // This is code that should be pulled out somewhere. Issue #3.
-                const expiry = new Date(p.Product.expiryYear, p.Product.expiryMonth - 1, p.Product.expiryDay);
-                return expiry <= next_friday;
+                return expirationDate(p.Product) <= next_friday;
             }).sort((a, b) => {
                 return a.Product.symbol.localeCompare(b.Product.symbol);
             });

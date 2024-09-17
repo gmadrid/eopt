@@ -97,6 +97,10 @@ export interface Product {
     strikePrice: number,
 }
 
+export const expirationDate = (product: Product) => {
+    return new Date(product.expiryYear, product.expiryMonth - 1, product.expiryDay);
+}
+
 interface PortfolioResponseWrapper {
     PortfolioResponse: PortfolioResponse,
 }
