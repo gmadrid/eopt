@@ -1,12 +1,13 @@
 import {ChangeEvent, ReactNode, useContext, useEffect, useState} from "react";
 import {AccountContext} from "@/lib/uicomponents/contexts/account_context";
 import {Transaction, TransactionListResponse} from "@/lib/etradeclient";
-import {formatCurrency, formatDate, formatDate8601, formatDateEtrade, formatProduct, from8601} from "@/lib/format";
+import {formatCurrency, formatDate, formatDate8601, formatProduct, from8601} from "@/lib/format";
 import {Col, OverlayTrigger, Row, Tooltip} from "react-bootstrap";
 import clsx from "clsx";
 import {ConfigContext} from "@/lib/uicomponents/contexts/config_context";
 import {OverlayInjectedProps} from "react-bootstrap/Overlay";
-import combineTransactions, {CombinedTransaction} from "@/lib/combine";
+import {CombinedTransaction} from "@/lib/combine";
+import {ETradeClientAPI} from "@/app/api/etrade_api";
 
 const LabelledCheck = (props: {
     label: string, checkboxId: string, checked: boolean, disabled?: boolean
@@ -232,19 +233,9 @@ export default function TransactionList() {
         if (!currentAccount) {
             return;
         }
-        if (startDate >= endDate) {
-            return;
-        }
-        const url = `${config.server_self_url}api/transactions/${currentAccount.accountIdKey}?startDate=${formatDateEtrade(startDate)}&endDate=${formatDateEtrade(endDate)}`;
-        fetch(url)
-            .then(r => r.json())
-            .then(j => {
-                let transaction_list_response = j as TransactionListResponse;
-                if (combine) {
-                    transaction_list_response.Transaction = combineTransactions(transaction_list_response.Transaction);
-                }
-                setTransactionListResponse(transaction_list_response);
-            });
+        let client = new ETradeClientAPI(config.server_self_url);
+        client.getTransactions(currentAccount.accountIdKey, startDate, endDate, combine)
+            .then(r => setTransactionListResponse(r));
     }, [currentAccount, startDate, endDate, combine]);
 
     useEffect(() => {

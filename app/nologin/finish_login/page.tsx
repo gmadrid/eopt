@@ -4,6 +4,7 @@ import {redirect} from "next/navigation";
 import {useContext, useEffect, useState} from "react";
 import {ConfigContext} from "@/lib/uicomponents/contexts/config_context";
 import {LoginContext} from "@/lib/uicomponents/contexts/login_context";
+import {ETradeClientAPI} from "@/app/api/etrade_api";
 
 export default function FinishLoginPage(input: any) {
     const [_loggedIn, setLoggedIn] = useContext(LoginContext);
@@ -20,13 +21,11 @@ export default function FinishLoginPage(input: any) {
 
     useEffect(() => {
         if (!authFinished && !done_already) {
-            // Set this before the fetch to ensure that we don't run this twice.
+            // Set this before the api call to ensure that we don't run this twice.
             done_already = true;
-            fetch(`${config.server_self_url}api/auth_callback?verifier=${verifier}`)
-                .then(r => {
-                    return r.json();
-                })
-                .then(async _j => {
+            let client = new ETradeClientAPI(config.server_self_url);
+            client.getAccessToken(verifier)
+                .then(() => {
                     setAuthFinished(true);
                     setLoggedIn(true);
                 });

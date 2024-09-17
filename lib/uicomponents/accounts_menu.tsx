@@ -1,8 +1,9 @@
 import React, {useContext, useEffect, useState} from "react";
 import {AccountContext} from "@/lib/uicomponents/contexts/account_context";
 import {AccountBalances, AccountListResponse} from "@/lib/etradeclient";
-import {formatCurrency} from "@/lib/format";
 import {ConfigContext} from "@/lib/uicomponents/contexts/config_context";
+import {ETradeClientAPI} from "@/app/api/etrade_api";
+import {formatCurrency} from "@/lib/format";
 
 export default function AccountsMenu(props: { loggedIn: boolean; }) {
     let loggedIn = props.loggedIn;
@@ -14,10 +15,9 @@ export default function AccountsMenu(props: { loggedIn: boolean; }) {
 
     useEffect(() => {
         if (loggedIn) {
-            fetch(`${config.server_self_url}api/accounts`)
-                .then(r => r.json())
-                .then(j => {
-                    const account_list_response = j.AccountListResponse as AccountListResponse;
+            let client = new ETradeClientAPI(config.server_self_url);
+            client.getAccounts()
+                .then(account_list_response => {
                     setAccounts(account_list_response);
                     if (!currentAccount && account_list_response.Accounts.Account.length > 0) {
                         setCurrentAccount!(account_list_response.Accounts.Account[0]);
@@ -30,10 +30,10 @@ export default function AccountsMenu(props: { loggedIn: boolean; }) {
         if (!currentAccount) {
             return;
         }
-        fetch(`http://localhost:3333/api/balances/${currentAccount.accountIdKey}`)
-            .then(r => r.json())
+        const client = new ETradeClientAPI(config.server_self_url);
+        client.getBalances(currentAccount.accountIdKey)
             .then(j => {
-                setAccountBalances(j as AccountBalances);
+                setAccountBalances(j);
             });
     }, [currentAccount]);
 

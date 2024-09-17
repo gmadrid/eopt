@@ -3,6 +3,7 @@
 import {Button, Col, Form, Row} from "react-bootstrap";
 import React, {useContext, useEffect} from "react";
 import {ConfigContext} from "@/lib/uicomponents/contexts/config_context";
+import {ETradeClientAPI} from "@/app/api/etrade_api";
 
 export default function LoginPage() {
     const [disabled, setDisabled] = React.useState(true);
@@ -10,10 +11,9 @@ export default function LoginPage() {
     const config = useContext(ConfigContext);
 
     useEffect(() => {
-        fetch(`${config.server_self_url}api/auth`).then(r => {
-            return r.json();
-        }).then(async j => {
-            setAuthUrl(j.auth_url);
+        const client = new ETradeClientAPI(config.server_self_url);
+        client.getAuthUrl().then(url => {
+            setAuthUrl(url);
             setDisabled(false);
         });
     }, []);

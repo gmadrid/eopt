@@ -14,7 +14,7 @@ export async function GET() {
     sesh.half_session = true;
     await sesh.save();
 
-    return NextResponse.json({auth_url: auth_data.authorize_url});
+    return NextResponse.json({url: auth_data.authorize_url});
 }
 
 

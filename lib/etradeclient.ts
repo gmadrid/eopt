@@ -11,7 +11,7 @@ function hash_function_sha1(base_string: string, key: string) {
         .digest('base64')
 }
 
-interface AuthorizationResponse {
+export interface AuthorizationResponse {
     request_token: OAuth.Token,
     authorize_url: string
 }
@@ -155,7 +155,7 @@ export class ETradeClient {
 
         let response = await fetch(makeRequest(request_data.url, authString));
         if (response.status !== 200) {
-            throw new Error(`Failed to get authorization URL: {response.status}: {response.statusText}`);
+            throw new Error(`Failed to get authorization URL: ${response.status}: ${response.statusText}`);
         }
 
         const body = await response.text();

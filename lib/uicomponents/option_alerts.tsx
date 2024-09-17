@@ -6,6 +6,7 @@ import {expirationDate, Portfolio, Position} from "@/lib/etradeclient";
 import {formatCurrency, formatProduct} from "@/lib/format";
 import clsx from "clsx";
 import {ConfigContext} from "@/lib/uicomponents/contexts/config_context";
+import {ETradeClientAPI} from "@/app/api/etrade_api";
 
 const getNextFriday = (): Date => {
     const today = new Date();
@@ -68,11 +69,10 @@ const OptionAlerts = () => {
         if (!currentAccount) {
             return;
         }
-        fetch(`${config.server_self_url}api/portfolio/${currentAccount.accountIdKey}`)
-            .then(r => r.json())
-            .then(j => {
-                setPortfolio(j as Portfolio);
-            });
+        let client = new ETradeClientAPI(config.server_self_url);
+        client.getPortfolio(currentAccount.accountIdKey).then((p) => {
+            setPortfolio(p);
+        });
     }, [currentAccount]);
 
     const alertableOptions = (portfolio: Portfolio): Position[] => {

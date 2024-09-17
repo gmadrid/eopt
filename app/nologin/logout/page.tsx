@@ -3,15 +3,16 @@
 import {useContext, useEffect, useState} from "react";
 import {redirect} from "next/navigation";
 import {ConfigContext} from "@/lib/uicomponents/contexts/config_context";
+import {ETradeClientAPI} from "@/app/api/etrade_api";
 
 export default function LoginPage() {
     let [unauth_done, setUnauthDone] = useState(false);
     let config = useContext(ConfigContext);
 
     useEffect(() => {
-        fetch(`${config.server_self_url}api/unauth`).then(r => {
+        const client = new ETradeClientAPI(config.server_self_url);
+        client.logout().then(() => {
             setUnauthDone(true);
-            return r.json();
         });
     }, []);
 
