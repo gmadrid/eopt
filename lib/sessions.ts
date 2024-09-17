@@ -11,6 +11,10 @@ export interface LoginSession {
     half_session: boolean;
 }
 
+export const sessionLoggedIn = (sesh: LoginSession) => {
+    return sesh.token && !sesh.half_session;
+}
+
 export async function getLoginSession(cookies: ReadonlyRequestCookies): Promise<IronSession<LoginSession>> {
     return await getSesh(cookies);
 }

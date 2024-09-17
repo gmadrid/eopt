@@ -1,6 +1,6 @@
 import {NextRequest, NextResponse} from "next/server";
 import {ETradeClient} from "@/lib/etradeclient";
-import {getLoginSession} from "@/lib/sessions";
+import {getLoginSession, sessionLoggedIn} from "@/lib/sessions";
 import {cookies} from "next/headers";
 
 export async function GET(request: NextRequest,
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest,
     }
 
     const sesh = await getLoginSession(cookies());
-    if (!sesh.token || sesh.half_session) {
+    if (!sessionLoggedIn(sesh)) {
         return NextResponse.json({error: "not logged in"});
     }
 
