@@ -1,4 +1,4 @@
-import {Transaction} from "@/lib/etradeclient";
+import {Product, Transaction} from "@/lib/etradeclient";
 import {formatProduct} from "@/lib/format";
 
 export interface CombinedTransaction {
@@ -37,7 +37,7 @@ const combineTransactions = (txns: Transaction[]): (Transaction & CombinedTransa
         if (lastTxn &&
             lastTxn.transactionDate === txn.transactionDate &&
             lastTxn.brokerage?.product &&
-            formatProduct(lastTxn.brokerage.product) === formatProduct(txn.brokerage.product)) {
+            compareProduct(lastTxn.brokerage.product, txn.brokerage.product)) {
             lastTxn.amount += txn.amount;
             lastTxn.brokerage.quantity += txn.brokerage.quantity;
             (lastTxn as Transaction & CombinedTransaction).combined = true;
@@ -48,5 +48,14 @@ const combineTransactions = (txns: Transaction[]): (Transaction & CombinedTransa
     });
     return combined as (Transaction & CombinedTransaction)[];
 }
+
+const compareProduct = (lp?: Product, rp?: Product): boolean =>
+    lp?.expiryDay === rp?.expiryDay &&
+    lp?.expiryMonth === rp?.expiryMonth &&
+    lp?.expiryYear === rp?.expiryYear &&
+    lp?.strikePrice === rp?.strikePrice &&
+    lp?.securityType === rp?.securityType &&
+    lp?.symbol === rp?.symbol &&
+    lp?.callPut === rp?.callPut;
 
 export default combineTransactions;
