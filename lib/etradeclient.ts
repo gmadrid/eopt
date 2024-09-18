@@ -127,6 +127,8 @@ export interface Complete {
     baseSymbolAndPrice: string,
 }
 
+/// Wrapper around the ETrade API.
+/// No requests are cached.
 export class ETradeClient {
     oauth: OAuth;
     token?: OAuth.Token;
@@ -152,8 +154,7 @@ export class ETradeClient {
 
         let authorization = this.oauth.authorize(request_data);
         let authString = this.oauth.toHeader(authorization).Authorization;
-
-        let response = await fetch(makeRequest(request_data.url, authString));
+        let response = await fetch(makeRequest(request_data.url, authString), {cache: 'no-store'});
         if (response.status !== 200) {
             throw new Error(`Failed to get authorization URL: ${response.status}: ${response.statusText}`);
         }
@@ -191,7 +192,7 @@ export class ETradeClient {
         let authHeader = this.oauth.toHeader(authorization).Authorization;
 
         let request = makeRequest(request_data.url, authHeader);
-        const response = await fetch(request);
+        const response = await fetch(request, {cache: 'no-store'});
         if (response.status !== 200) {
             throw new Error(`Failed to get access token: {response.status}: {response.statusText}`);
         }
@@ -220,7 +221,7 @@ export class ETradeClient {
         let authHeader = this.oauth.toHeader(authorization).Authorization;
 
         let request = makeRequest(request_data.url, authHeader);
-        const response = await fetch(request);
+        const response = await fetch(request, {cache: 'no-store'});
         if (response.status === 204 && handle204) {
             return handle204();
         }
