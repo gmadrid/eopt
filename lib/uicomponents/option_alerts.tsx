@@ -83,7 +83,7 @@ const OptionAlerts = () => {
 
         return portfolio.positions
             .filter(p => p.Product.securityType === "OPTN")
-            .filter(p => inTheMoney(p) || closeToMoney(p))
+            //.filter(p => inTheMoney(p) || closeToMoney(p))
             .filter(p => {
                 return expirationDate(p.Product) <= next_friday;
             }).sort((a, b) => {
@@ -98,24 +98,44 @@ const OptionAlerts = () => {
 
     return (
         <div className="alert alert-danger">
-            <div className="pb-2"><strong className="fs-4">Options to watch</strong></div>
-            {alert_list.map(p => {
-                const pieces = p.Complete?.baseSymbolAndPrice.trim().split('/');
-                const price = formatCurrency(parseFloat(pieces[1]));
-                const in_the_money = inTheMoney(p);
-                const close_to_money = closeToMoney(p);
+            <div className="pb-2"><strong className="fs-4">Alerts</strong></div>
+            <table className="table w-auto table-danger table-hover table-sm">
+                <thead>
+                <th className="fw-bold fs-6"></th>
+                <th className="fw-bold fs-6">Option</th>
+                <th className="fw-bold fs-6">Stock price</th>
+                </thead>
+                <tbody>
+                {alert_list.map(p => {
+                    const pieces = p.Complete?.baseSymbolAndPrice.trim().split('/');
+                    const price = formatCurrency(parseFloat(pieces[1]));
+                    const in_the_money = inTheMoney(p);
+                    const close_to_money = closeToMoney(p);
 
-                let alert = in_the_money;
-                let warning = close_to_money && !in_the_money;
-                let info = !close_to_money && !in_the_money;
-                let prefix = in_the_money ? "Alert — In the money: " : close_to_money ? "Warning — Close to money: " : "";
+                    let alert = in_the_money;
+                    let warning = close_to_money && !in_the_money;
+                    let info = !close_to_money && !in_the_money;
+                    let prefix = in_the_money ?
+                        <span className="badge text-bg-danger">&nbsp;Alert&nbsp;</span> :
+                        close_to_money ?
+                            <span className="badge text-bg-warning">Warning</span> :
+                            <></>;
 
-                return <div className={clsx("fw-bold", "fs-5", {
-                    'text-danger': alert,
-                    'text-primary': warning,
-                    'text-secondary': info,
-                })}>{prefix}{formatProduct(p.Product)} - {price}</div>
-            })}
+
+                    let classes = clsx("fs-6", "py-0", "border-0", {
+                        'text-danger': alert,
+                        'text-secondary': info,
+                        'text-black': warning,
+                        'fw-bold': alert || warning,
+                    })
+                    return <tr>
+                        <td className={classes}>{prefix}</td>
+                        <td className={classes}>{formatProduct(p.Product)}</td>
+                        <td className={classes}>{price}</td>
+                    </tr>
+                })}
+                </tbody>
+            </table>
         </div>
     );
 }
