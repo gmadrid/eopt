@@ -84,7 +84,7 @@ const TransactionTable = (props: {
         return <div></div>;
     }
 
-    return <table className="ms-1">
+    return <table className="ms-1 mb-4">
         <thead>
         <tr>
             <th className="ps-2">Txn. Date</th>

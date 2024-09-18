@@ -4,7 +4,7 @@ import crypto from "crypto";
 const consumer_key = process.env.ETRADE_CONSUMER_KEY!;
 const consumer_secret = process.env.ETRADE_CONSUMER_SECRET!;
 
-function hash_function_sha1(base_string: string, key: string) {
+function hash_function_sha1(base_string: string, key: string): string {
     return crypto
         .createHmac('sha1', key)
         .update(base_string)
@@ -97,7 +97,7 @@ export interface Product {
     strikePrice: number,
 }
 
-export const expirationDate = (product: Product) => {
+export const expirationDate = (product: Product): Date => {
     return new Date(product.expiryYear, product.expiryMonth - 1, product.expiryDay);
 }
 
@@ -221,7 +221,7 @@ export class ETradeClient {
 
         let request = makeRequest(request_data.url, authHeader);
         const response = await fetch(request);
-        if (response.status === 204) {
+        if (response.status === 204 && handle204) {
             return handle204();
         }
         if (response.status !== 200) {
@@ -262,7 +262,7 @@ export class ETradeClient {
     }
 }
 
-function makeRequest(url: string, authString: string) {
+function makeRequest(url: string, authString: string): Request {
     return new Request(url, {
         headers: new Headers([
             ["Authorization", authString],
