@@ -68,4 +68,28 @@ So, for the Options screen, I think I want to:
     - show gains/losses as percentage (of what?)
     - one day, maybe link to an order on the eTrade site
 
+## Finding options groups
 
+- Groupings that I am likely to look for
+    - Covered calls
+        - Find a stock
+        - Find a call
+            - sold (negative quantity)
+            - quantity * 100 < stock quantity
+    - Bull call spread (there are many spreads, but I typically only have these)
+        - Find a LONG call
+        - Find a SHORT call
+            - strike > LONG call strike
+            - expiration == LONG call expiration
+            - quantity == LONG call quantity
+    - Sold put covered by a long put
+        - Find a SHORT put
+        - Find a LONG put
+            - expiration >= SHORT put expiration
+            - quantity == SHORT put quantity
+    - Synthetic long
+        - find a LONG call
+        - find a SHORT put
+            - strike == LONG call strike
+            - expiration == LONG call expiration
+            - quantity == LONG call quantity

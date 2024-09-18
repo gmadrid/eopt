@@ -119,12 +119,14 @@ export interface Portfolio {
 
 export interface Position {
     positionId: number,
+    quantity: number,
     Product: Product,
     Complete: Complete,
 }
 
 export interface Complete {
     baseSymbolAndPrice: string,
+    price: number,
 }
 
 /// Wrapper around the ETrade API.

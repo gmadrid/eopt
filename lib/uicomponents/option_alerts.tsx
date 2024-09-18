@@ -22,7 +22,7 @@ const getNextFriday = (): Date => {
     return nextFriday;
 };
 
-const inTheMoney = (position: Position): boolean => {
+export const inTheMoney = (position: Position): boolean => {
     // Do we have the data?
     if (!position.Complete) {
         return false;
@@ -43,7 +43,7 @@ const inTheMoney = (position: Position): boolean => {
     }
 }
 
-const closeToMoney = (position: Position): boolean => {
+export const closeToMoney = (position: Position): boolean => {
     // Do we have the data?
     if (!position.Complete) {
         return false;
@@ -101,9 +101,11 @@ const OptionAlerts = () => {
             <div className="pb-2"><strong className="fs-4">Alerts</strong></div>
             <table className="table w-auto table-danger table-hover table-sm">
                 <thead>
-                <th className="fw-bold fs-6"></th>
-                <th className="fw-bold fs-6">Option</th>
-                <th className="fw-bold fs-6">Stock price</th>
+                <tr>
+                    <th className="fw-bold fs-6"></th>
+                    <th className="fw-bold fs-6">Option</th>
+                    <th className="fw-bold fs-6">Stock price</th>
+                </tr>
                 </thead>
                 <tbody>
                 {alert_list.map(p => {
@@ -128,7 +130,7 @@ const OptionAlerts = () => {
                         'text-black': warning,
                         'fw-bold': alert || warning,
                     })
-                    return <tr>
+                    return <tr key={p.positionId}>
                         <td className={classes}>{prefix}</td>
                         <td className={classes}>{formatProduct(p.Product)}</td>
                         <td className={classes}>{price}</td>

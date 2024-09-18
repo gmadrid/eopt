@@ -36,7 +36,7 @@ const combineTransactions = (txns: Transaction[]): (Transaction & CombinedTransa
     return combined as (Transaction & CombinedTransaction)[];
 }
 
-const compareProducts = (lhs?: Product, rhs?: Product): number => {
+export const compareProducts = (lhs?: Product, rhs?: Product): number => {
     if (lhs == rhs) {
         return 0;
     }
