@@ -105,16 +105,23 @@ interface PortfolioResponseWrapper {
     PortfolioResponse: PortfolioResponse,
 }
 
-interface PortfolioResponse {
+export interface PortfolioResponse {
     AccountPortfolio: AccountPortfolio[],
+    Totals: PortfolioTotals,
 }
 
-interface AccountPortfolio {
+export interface PortfolioTotals {
+    todaysGainLoss: number,
+    todaysGainLossPct: number,
+    totalMarketValue: number,
+    totalGainLoss: number,
+    totalGainLossPct: number,
+    totalPricePaid: number,
+    cashBalance: number
+}
+
+export interface AccountPortfolio {
     Position: Position[],
-}
-
-export interface Portfolio {
-    positions: Position[],
 }
 
 export interface Position {
@@ -208,7 +215,7 @@ export class ETradeClient {
         };
     }
 
-    async getJsonResponse<T>(name: string, url: string, handle204?: () => T): Promise<T> {
+    async getJsonResponse<T>(name: string, url: string, handle204?: () => T, dump?: boolean): Promise<T> {
         if (!this.token) {
             throw new Error(`${name} requires access token.`);
         }
@@ -231,7 +238,11 @@ export class ETradeClient {
             throw new Error(`${name} failed: ${response.status}: ${response.statusText}`);
         }
 
-        return await response.json() as T;
+        const json = await response.json();
+        if (dump) {
+            console.log(json);
+        }
+        return json;
     }
 
     async getAccounts(): Promise<AccountListResponseWrapper> {
@@ -248,11 +259,11 @@ export class ETradeClient {
         return wrapper.BalanceResponse;
     }
 
-    async getPortfolio(accountIdKey: string): Promise<Portfolio> {
+    async getPortfolio(accountIdKey: string): Promise<PortfolioResponse> {
         const wrapper = await this.getJsonResponse<PortfolioResponseWrapper>(
             "getPortfolio",
-            `https://api.etrade.com/v1/accounts/${accountIdKey}/portfolio?count=200&view=COMPLETE`);
-        return {positions: wrapper.PortfolioResponse.AccountPortfolio[0].Position};
+            `https://api.etrade.com/v1/accounts/${accountIdKey}/portfolio?count=200&view=COMPLETE&totalsRequired=true`, undefined, true);
+        return wrapper.PortfolioResponse;
     }
 
     async getTransactions(accountIdKey: string, startDate: string, endDate: string): Promise<TransactionListResponse> {

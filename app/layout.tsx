@@ -1,8 +1,7 @@
-import type {Metadata} from "next";
 import {Inter} from "next/font/google";
 import "./globals.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import {Col, Container, Navbar, NavbarBrand, Row} from "react-bootstrap";
+import {Col, Container, Row} from "react-bootstrap";
 import clsx from 'clsx';
 import Sidebar from "@/app/sidebar";
 import {headers} from "next/headers";
@@ -13,24 +12,9 @@ import TabbContextComponent from "@/lib/uicomponents/contexts/tab_context";
 import TabSelector from "@/lib/uicomponents/tab_selector";
 import ConfigContextComponent from "@/lib/uicomponents/contexts/config_context";
 import EoptConfig from "@/lib/eopt_config";
+import {EoptNavbar} from "@/lib/uicomponents/eoptNavbar";
 
 const inter = Inter({subsets: ["latin"]});
-
-export const metadata: Metadata = {
-    title: "eTrade Options Tool",
-    description: "Most advanced options trading tool on this site",
-};
-
-const EoptNavbar = () => {
-    return (
-        <Navbar expand="lg" className="bg-body-secondary">
-            <Container fluid={true}>
-                <NavbarBrand>eOpt</NavbarBrand>
-            </Container>
-        </Navbar>
-
-    );
-}
 
 export default function RootLayout({
                                        children,

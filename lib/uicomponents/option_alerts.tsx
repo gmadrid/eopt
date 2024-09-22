@@ -2,7 +2,7 @@
 
 import {useContext, useEffect, useState} from "react";
 import {AccountContext} from "@/lib/uicomponents/contexts/account_context";
-import {expirationDate, Portfolio, Position} from "@/lib/etradeclient";
+import {AccountPortfolio, expirationDate, PortfolioResponse, Position} from "@/lib/etradeclient";
 import {formatCurrency, formatProduct} from "@/lib/format";
 import clsx from "clsx";
 import {ConfigContext} from "@/lib/uicomponents/contexts/config_context";
@@ -61,7 +61,7 @@ export const closeToMoney = (position: Position): boolean => {
 }
 
 const OptionAlerts = () => {
-    let [portfolio, setPortfolio] = useState({} as Portfolio);
+    let [portfolioResponse, setPortfolioResponse] = useState(undefined as PortfolioResponse | undefined);
     let [currentAccount] = useContext(AccountContext);
     let config = useContext(ConfigContext);
 
@@ -71,17 +71,17 @@ const OptionAlerts = () => {
         }
         let client = new ETradeClientAPI(config.server_self_url);
         client.getPortfolio(currentAccount.accountIdKey).then((p) => {
-            setPortfolio(p);
+            setPortfolioResponse(p);
         });
     }, [currentAccount]);
 
-    const alertableOptions = (portfolio: Portfolio): Position[] => {
-        if (!portfolio.positions) {
+    const alertableOptions = (portfolio: AccountPortfolio): Position[] => {
+        if (!portfolio.Position) {
             return [];
         }
         const next_friday = getNextFriday();
 
-        return portfolio.positions
+        return portfolio.Position
             .filter(p => p.Product.securityType === "OPTN")
             //.filter(p => inTheMoney(p) || closeToMoney(p))
             .filter(p => {
@@ -91,7 +91,11 @@ const OptionAlerts = () => {
             });
     }
 
-    const alert_list = alertableOptions(portfolio);
+    if (!portfolioResponse) {
+        return <></>
+    }
+
+    const alert_list = alertableOptions(portfolioResponse.AccountPortfolio[0]);
     if (alert_list.length === 0) {
         return <></>;
     }

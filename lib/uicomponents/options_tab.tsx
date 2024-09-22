@@ -3,35 +3,36 @@
 import {ReactNode, useContext, useEffect, useState} from "react";
 import {ConfigContext} from "@/lib/uicomponents/contexts/config_context";
 import {ETradeClientAPI} from "@/app/api/etrade_api";
-import {Portfolio, Position} from "@/lib/etradeclient";
+import {AccountPortfolio, Position} from "@/lib/etradeclient";
 import {AccountContext} from "@/lib/uicomponents/contexts/account_context";
 import {formatCurrency, formatProduct} from "@/lib/format";
 import {compareProducts} from "@/lib/combine";
 import findStrategies, {POSITION_TYPE_STOCK} from "@/lib/options/strategies";
 import {closeToMoney, inTheMoney} from "@/lib/uicomponents/option_alerts";
+import {Col, Row} from "react-bootstrap";
 
 export default function OptionsTab() {
     let config = useContext(ConfigContext);
     let [currentAccount] = useContext(AccountContext);
 
-    let [portfolio, setPortfolio] = useState<Portfolio | undefined>(undefined);
+    let [portfolio, setPortfolio] = useState<AccountPortfolio | undefined>(undefined);
     useEffect(() => {
         if (!currentAccount) {
             return;
         }
 
         const client = new ETradeClientAPI(config.server_self_url);
-        client.getPortfolio(currentAccount?.accountIdKey).then(portfolio => {
-            setPortfolio(portfolio);
+        client.getPortfolio(currentAccount?.accountIdKey).then(portfolioResponse => {
+            setPortfolio(portfolioResponse.AccountPortfolio[0]);
         });
 
-    }, []);
+    }, [currentAccount]);
 
     if (!portfolio) {
         return <div>Loading...</div>;
     }
 
-    const ordered = portfolio.positions.toSorted((a, b) => compareProducts(a.Product, b.Product));
+    const ordered = portfolio.Position.toSorted((a, b) => compareProducts(a.Product, b.Product));
     const optionSymbols = new Set(ordered.filter(position => position.Product.securityType === "OPTN").map(position => position.Product.symbol));
     const optionsAndRelated = ordered.filter(position => optionSymbols.has(position.Product.symbol));
 
@@ -42,9 +43,9 @@ export default function OptionsTab() {
         findStrategies(group);
     });
 
-    return <div className="pb-5">
+    return <Row className="pb-5">
         {Object.keys(groups).map(symbol => <OptionGroup key={symbol} optionsAndRelated={groups[symbol]}/>)}
-    </div>;
+    </Row>;
 }
 
 // Find a stock price in a list.
@@ -67,13 +68,13 @@ const OptionGroup = ({optionsAndRelated}: { optionsAndRelated: Position[] }) => 
     const [remaining, strategies] = findStrategies(optionsAndRelated);
     const symbol = optionsAndRelated[0].Product.symbol;
 
-    return <div className="pb-3">
+    return <Col sm={4} className="pb-3 rounded rounded-2 border border-black p-3">
         <h4>{symbol} &mdash; {formatCurrency(findStockPrice(optionsAndRelated))}</h4>
         {remaining.map(position =>
             <div key={position.positionId}>{position.quantity} {formatProduct(position.Product)}</div>
         )}
         {strategies.map(strategy =>
-            <div key={strategy.position1.positionId} className="ms-4 mb-3 border-1 border-start border-primary ps-2">
+            <div key={strategy.position1.positionId} className="">
                 <strong>{strategy.strategyType}</strong>
                 <div><OptionBadge
                     position={strategy.position1}/> {strategy.position1.quantity} {formatProduct(strategy.position1.Product)}
@@ -84,14 +85,14 @@ const OptionGroup = ({optionsAndRelated}: { optionsAndRelated: Position[] }) => 
                     </div>}
             </div>
         )}
-    </div>;
+    </Col>;
 }
 
 const OptionBadge = ({position}: { position: Position }): ReactNode => {
     if (inTheMoney(position)) {
-        return <span className="badge bg-danger">In the money</span>;
+        return <span className="badge bg-danger">ITM</span>;
     } else if (closeToMoney(position)) {
-        return <span className="badge bg-warning">Close to money</span>;
+        return <span className="badge bg-warning">CTM</span>;
     } else {
         return <></>
     }
