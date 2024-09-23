@@ -10,19 +10,19 @@ import {formatCurrency, formatPercent} from "@/lib/format";
 
 export const EoptNavbar = () => {
     let [portfolioResponse, setPortfolioResponse] = useState<PortfolioResponse | undefined>(undefined);
-    const context = useContext(ConfigContext);
+    const config = useContext(ConfigContext);
     const [currentAccount] = useContext(AccountContext);
 
     useEffect(() => {
         if (!currentAccount) {
             return;
         }
-        const client = new ETradeClientAPI(context.server_self_url);
+        const client = new ETradeClientAPI(config.server_self_url);
         client.getPortfolio(currentAccount.accountIdKey)
             .then((portfolioResponse) => {
                 setPortfolioResponse(portfolioResponse);
             });
-    }, [currentAccount]);
+    }, [currentAccount, config.server_self_url]);
 
     return (
         <Navbar expand="lg" className="bg-body-secondary">
@@ -33,7 +33,7 @@ export const EoptNavbar = () => {
                         <>
                             <Col sm="auto">
                                 <div>
-                                    <small>Today's gain:&nbsp;
+                                    <small>Today&apos;s gain:&nbsp;
                                         {formatCurrency(portfolioResponse.Totals.todaysGainLoss)}&nbsp;
                                         ({formatPercent(portfolioResponse.Totals.todaysGainLossPct)})
                                     </small>

@@ -236,7 +236,7 @@ export default function TransactionList() {
         let client = new ETradeClientAPI(config.server_self_url);
         client.getTransactions(currentAccount.accountIdKey, startDate, endDate, combine)
             .then(r => setTransactionListResponse(r));
-    }, [currentAccount, startDate, endDate, combine]);
+    }, [currentAccount, startDate, endDate, combine, config.server_self_url]);
 
     useEffect(() => {
         let symbolSet = new Set<string>();

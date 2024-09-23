@@ -14,7 +14,7 @@ export default function LoginPage() {
         client.logout().then(() => {
             setUnauthDone(true);
         });
-    }, []);
+    }, [config.server_self_url]);
 
     if (unauth_done) {
         redirect('/nologin/login');

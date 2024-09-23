@@ -24,7 +24,7 @@ export default function AccountsMenu(props: { loggedIn: boolean; }) {
                     }
                 });
         }
-    }, [loggedIn, currentAccount, setCurrentAccount]);
+    }, [loggedIn, currentAccount, setCurrentAccount, config.server_self_url]);
 
     useEffect(() => {
         if (!currentAccount) {
@@ -35,7 +35,7 @@ export default function AccountsMenu(props: { loggedIn: boolean; }) {
             .then(j => {
                 setAccountBalances(j);
             });
-    }, [currentAccount]);
+    }, [currentAccount, config.server_self_url]);
 
     if (!loggedIn) {
         return <></>

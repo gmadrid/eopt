@@ -22,6 +22,7 @@ export default function FinishLoginPage(input: any) {
     useEffect(() => {
         if (!authFinished && !done_already) {
             // Set this before the api call to ensure that we don't run this twice.
+            // eslint-disable-next-line react-hooks/exhaustive-deps
             done_already = true;
             let client = new ETradeClientAPI(config.server_self_url);
             client.getAccessToken(verifier)

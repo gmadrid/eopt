@@ -16,7 +16,7 @@ export default function LoginPage() {
             setAuthUrl(url);
             setDisabled(false);
         });
-    }, []);
+    }, [config.server_self_url]);
 
     return <>
         <h1>eTrade login</h1>

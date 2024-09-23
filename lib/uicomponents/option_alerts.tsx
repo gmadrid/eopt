@@ -73,7 +73,7 @@ const OptionAlerts = () => {
         client.getPortfolio(currentAccount.accountIdKey).then((p) => {
             setPortfolioResponse(p);
         });
-    }, [currentAccount]);
+    }, [currentAccount, config.server_self_url]);
 
     const alertableOptions = (portfolio: AccountPortfolio): Position[] => {
         if (!portfolio.Position) {

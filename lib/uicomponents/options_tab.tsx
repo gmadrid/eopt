@@ -26,7 +26,7 @@ export default function OptionsTab() {
             setPortfolio(portfolioResponse.AccountPortfolio[0]);
         });
 
-    }, [currentAccount]);
+    }, [currentAccount, config.server_self_url]);
 
     if (!portfolio) {
         return <div>Loading...</div>;
