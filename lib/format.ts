@@ -62,6 +62,15 @@ export const from8601 = (dateString: string): Date => {
     return new Date(utcDate.getTime() + utcDate.getTimezoneOffset() * 60000);
 }
 
+export const formatDateShort = (date: Date | number): string => {
+    const formatter = new Intl.DateTimeFormat('en-US', {
+        month: '2-digit',
+        day: '2-digit',
+    });
+
+    return formatter.format(date);
+}
+
 export const formatPercent = (percent: number): string => {
     return `${percent.toFixed(2)}%`;
 }

@@ -134,6 +134,7 @@ export interface Position {
 export interface Complete {
     baseSymbolAndPrice: string,
     price: number,
+    exDividendDate: number,
 }
 
 /// Wrapper around the ETrade API.

@@ -3,7 +3,7 @@
 import {useContext, useEffect, useState} from "react";
 import {AccountContext} from "@/lib/uicomponents/contexts/account_context";
 import {AccountPortfolio, expirationDate, PortfolioResponse, Position} from "@/lib/etradeclient";
-import {formatCurrency, formatProduct} from "@/lib/format";
+import {formatCurrency, formatDateShort, formatProduct} from "@/lib/format";
 import clsx from "clsx";
 import {ConfigContext} from "@/lib/uicomponents/contexts/config_context";
 import {ETradeClientAPI} from "@/app/api/etrade_api";
@@ -109,6 +109,7 @@ const OptionAlerts = () => {
                     <th className="fw-bold fs-6"></th>
                     <th className="fw-bold fs-6">Option</th>
                     <th className="fw-bold fs-6">Stock price</th>
+                    <th className="fw-bold fs-6">Ex-div.</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -126,7 +127,7 @@ const OptionAlerts = () => {
                         close_to_money ?
                             <span className="badge text-bg-warning">Warning</span> :
                             <></>;
-
+                    let exdiv_formatted = p.Complete.exDividendDate ? formatDateShort(p.Complete.exDividendDate) : "";
 
                     let classes = clsx("fs-6", "py-0", "border-0", {
                         'text-danger': alert,
@@ -138,6 +139,7 @@ const OptionAlerts = () => {
                         <td className={classes}>{prefix}</td>
                         <td className={classes}>{formatProduct(p.Product)}</td>
                         <td className={classes}>{price}</td>
+                        <td className={classes}>{exdiv_formatted}</td>
                     </tr>
                 })}
                 </tbody>
